@@ -1,2 +1,2 @@
 # spack-next
-spack next version ,which will suporrt isomorphism  
+spack next version ,which will support isomorphism  
