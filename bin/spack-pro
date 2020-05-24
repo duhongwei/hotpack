@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+const Logger = require('../lib/logger')
+const { makeConfig } = require('../lib/config')
+const program = require('commander')
+const App = require('../lib/app')
+const server = require('../lib/server')
+process.env.NODE_ENV = 'production'
+program
+  .usage('[options]')
+  .option('-c,--clean', 'ignore file version,rebuild all files')
+  .option('-d,--directory', 'work directory')
+  .option('-p,--port [port]', 'web server port')
+  .option('-s,--server', 'web server')
+  .option('-f,--folder [folder]', 'config folder')
+  .parse(process.argv)
+
+const logger = new Logger()
+let specialConfig = {
+  logger,
+  env:'production'
+}
+if (program.directory) {
+  specialConfig.directory = program.directory
+}
+if (program.clean) {
+  specialConfig.clean = true
+}
+if (program.folder) {
+  specialConfig.folder = program.folder
+}
+const config = makeConfig(specialConfig)
+const app = new App(config)
+app.build().then(() => {
+  if (program.server) {
+    server.init({
+      app,
+      port: program.port || 3000
+    })
+  }
+})

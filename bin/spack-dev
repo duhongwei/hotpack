@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+import program from 'commander'
+import App from '../lib/App.js'
+import server from '../lib/server.js'
+import Config from '../lib/Config.js'
+
+process.env.NODE_ENV = 'development'
+
+program
+  .usage('[options]')
+  .option('-c,--clean', 'ignore file version,rebuild all files')
+  .option('-p,--port [port]', 'web server port')
+  .option('-s --server', 'server without')
+  .option('-f,--folder [folder]', 'config folder')
+  .parse(process.argv)
+
+const specialConfig = {
+  env: 'development',
+  port: program.port || 3000
+}
+
+if (program.clean) {
+  specialConfig.clean = true
+}
+if (program.folder) {
+  specialConfig.folder = program.folder
+}
+async function init() {
+  const c = new Config(specialConfig)
+  const config = await c.getDev()
+
+  const app = new App({ config })
+
+  await app.build()
+
+  if (!program.server) {
+    server({
+      app
+    })
+  }
+}
+init()
