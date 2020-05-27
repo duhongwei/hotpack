@@ -11,8 +11,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@duhongwei/parser": "^2.3.1",
     "buble": "^0.20.0",
     "chalk": "^4.0.0",
+    "clone": "^2.1.2",
     "commander": "^5.1.0",
     "fs-extra": "^9.0.0",
     "koa": "^2.11.0",

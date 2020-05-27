@@ -1,62 +1,69 @@
-export default function (config) {
-  return async function (spack, debug) {
-    let { Fs, resolvePath, config: { logger } } = spack
-    logger.log('run plugin node')
-    spack.on('afterParse', () => {
-      const path = resolvePath('package.json')
-      if (!Fs.existsSync(path)) {
-        logger.error('package.json not exist')
-        process.exit(1)
-      }
-      let json = Fs.readFileSync(path)
-      try {
-        json = JSON.parse(json)
-      }
-      catch (e) {
-        logger.error(`parse package.json failed. ${e.message}`)
-        process.exit(1)
-      }
-      let dependencies = json.dependencies || {}
-      const keys = Object.key(dependencies)
-      for (let key of keys) {
-        let files = []
-        if (key in config) {
-          let { path, publicKey = key, deps = [] } = config[key]
-          let path = resolvePath(path)
-          if (Fs.existsSync(path)) {
-            let code = Fs.readFileSync(path)
-            let importInfo = []
-            if (deps.length > 0) {
-              importInfo = deps.map(item => {
-                return {
-                  type: 'js',
-                  file: item,
-                  token: [{ 'from': 'default', 'to': item }]
-                }
-              })
-            }
+import parser from '@duhongwei/parser'
+import { resolve } from 'path'
 
-            let exportInfo = [
-              {
-                from: `window['${publicKey}']`,
-                to: 'default'
-              }
-            ]
+export default async function ({ spack, debug, debugPrefix, opt }) {
+  debug = debug(`${debugPrefix}node`)
+  debug('init plugin node')
 
-          }
-          else {
-            logger.error(`node dependencie ${key} not exist\nmaybe you should run "npm install ${nodeKey} --save"`)
-            process.exit(1)
-          }
-        }
-        else {
-          debug('omit node dependencie ${key}')
-        }
-        files.push({
-          key,
-          content
-        })
+  let { config: { logger }, fs, version } = spack
+  spack.on('mount', function () {
+    debug('on event mount')
+    this.addResolvePath({
+      test: /^[@a-zA-Z_].+[a-zA-Z0-9_-]$/,
+      resolve: ({ path, file }) => {
+
+        debug(`resolve path ${path} of ${file}`)
+        return `node/${path}.js`
       }
     })
-  }
+    this.addResolveKey({
+      test: /^node\//,
+      resolve: async ({ key, rawKey, file }) => {
+        debug(`resolve key ${rawKey} of ${file}`)
+        if (!opt) {
+          logger.error('opt required')
+        }
+        if (!(rawKey in opt)) {
+          logger.error(`${rawKey} not defined`)
+        }
+        let { path, exports = '', imports = '' } = opt[rawKey]
+        path = resolve('node_modules', rawKey, path)
+        if (version.has(key)) {
+          let packagePath = resolve('node_modules', rawKey, 'package.json')
+          let packageInfo = fs.readFileSync(packagePath)
+          if (!packageInfo) {
+            logger.error(`path ${packagePath} not exist`, true)
+          }
+
+          if (version.get(key).version === packageInfo.version) {
+            logger.info(`omit ${rawKey},file version is ${packageInfo.version}`)
+            return
+          }
+          else {
+            version.set(key, { version: packageInfo.version })
+          }
+        }
+
+        let content = fs.readFileSync(path)
+        if (!content) {
+          logger.error(`path ${path} not exist`, true)
+        }
+        else {
+          const es6Parser = new parser.Es6(`
+          ${imports}
+          ${exports}
+          `)
+          let info = es6Parser.parse()
+          spack.add({
+            key,
+            importInfo: info.importInfo,
+            exportInfo: info.exportInfo,
+            content,
+            extname: '.js'
+          })
+        }
+      }
+    })
+  })
+
 }

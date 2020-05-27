@@ -17,7 +17,8 @@ program
 
 const specialConfig = {
   env: 'development',
-  port: program.port || 3000
+  port: program.port || 3000,
+  isHot:false
 }
 
 if (program.clean) {
