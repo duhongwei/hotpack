@@ -1,9 +1,10 @@
 #!/usr/bin/env node
 
 import program from 'commander'
-import App from '../lib/App.js'
+
 import server from '../lib/server.js'
 import Config from '../lib/Config.js'
+import Spack from '../lib/Spack.js'
 
 process.env.NODE_ENV = 'development'
 
@@ -31,7 +32,7 @@ async function init() {
   const c = new Config(specialConfig)
   const config = await c.getDev()
 
-  const app = new App({ config })
+  const app = await new Spack({ config })
 
   await app.build()
 

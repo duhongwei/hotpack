@@ -1,69 +1,63 @@
-import parser from '@duhongwei/parser'
-import { resolve } from 'path'
 
-export default async function ({ spack, debug, debugPrefix, opt }) {
-  debug = debug(`${debugPrefix}node`)
-  debug('init plugin node')
+import { resolve, join } from 'path'
 
-  let { config: { logger }, fs, version } = spack
-  spack.on('mount', function () {
-    debug('on event mount')
-    this.addResolvePath({
-      test: /^[@a-zA-Z_].+[a-zA-Z0-9_-]$/,
-      resolve: ({ path, file }) => {
+export default async function ({ debug, opt }) {
 
-        debug(`resolve path ${path} of ${file}`)
-        return `node/${path}.js`
+  let { config: { logger }, fs, version } = this
+
+  this.on('file', async function () {
+    logger.log('on event file')
+    let paths = []
+    for (let key in opt) {
+      debug(`add  ${key}`)
+      let { path } = opt[key]
+
+      let p = resolve('node_modules', key)
+
+      let packagePath = join(p, 'package.json')
+      let packageInfo = fs.readFileSync(packagePath)
+      if (!packageInfo) {
+        logger.error(`path ${packagePath} not exist`, true)
       }
-    })
-    this.addResolveKey({
-      test: /^node\//,
-      resolve: async ({ key, rawKey, file }) => {
-        debug(`resolve key ${rawKey} of ${file}`)
-        if (!opt) {
-          logger.error('opt required')
-        }
-        if (!(rawKey in opt)) {
-          logger.error(`${rawKey} not defined`)
-        }
-        let { path, exports = '', imports = '' } = opt[rawKey]
-        path = resolve('node_modules', rawKey, path)
-        if (version.has(key)) {
-          let packagePath = resolve('node_modules', rawKey, 'package.json')
-          let packageInfo = fs.readFileSync(packagePath)
-          if (!packageInfo) {
-            logger.error(`path ${packagePath} not exist`, true)
-          }
+      if (version.has(key) && version.get(key).version === packageInfo.version) {
+        debug(`omit ${key},file version is ${packageInfo.version}`)
 
-          if (version.get(key).version === packageInfo.version) {
-            logger.info(`omit ${rawKey},file version is ${packageInfo.version}`)
-            return
-          }
-          else {
-            version.set(key, { version: packageInfo.version })
-          }
-        }
-
-        let content = fs.readFileSync(path)
-        if (!content) {
-          logger.error(`path ${path} not exist`, true)
-        }
-        else {
-          const es6Parser = new parser.Es6(`
-          ${imports}
-          ${exports}
-          `)
-          let info = es6Parser.parse()
-          spack.add({
-            key,
-            importInfo: info.importInfo,
-            exportInfo: info.exportInfo,
-            content,
-            extname: '.js'
-          })
-        }
       }
-    })
+      else {
+        version.set({
+          key,
+          version: packageInfo.version
+        })
+        paths.push(join(p, path))
+      }
+    }
+    this.addPath(paths)
+  })
+  this.on('key', function (files) {
+    logger.log('on event key')
+    for (let file of files) {
+      if (/\/node_modules\//.test(file.key)) {
+        const pathList = file.key.split('/')
+        let nodeKey = pathList[pathList.indexOf('node_modules') + 1]
+        const { exports = '', imports = '' } = opt[nodeKey]
+
+        file.key = `node/${nodeKey}.js`
+        file.content = `
+        ${imports}
+        ${file.content}
+        ${exports}
+        `
+        debug(`${nodeKey} ${file.path} => ${file.key}`)
+      }
+    }
+  })
+  this.addResolvePath({
+    test: /^[@a-zA-Z_].+[a-zA-Z0-9_-]$/,
+    resolve: ({ path, file }) => {
+      let key = `node/${path}.js`
+      debug(`resolve path:${path} to key:${key} in ${file}`)
+      return key
+    }
   })
 
 }
