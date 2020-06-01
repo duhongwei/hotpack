@@ -6,12 +6,12 @@ export default async function ({ debug, opt }) {
   let { config: { logger }, util: { isHtml }, version } = this
   const KEY = 'runtime/hotload.js'
   this.on('file', async function () {
-    logger.log('on event file')
+    debug('on event file')
     let path = join(this.root, 'browser/hotload.js')
     this.addPath(path)
   })
   this.on('key', function (files) {
-    logger.log('on event key')
+    debug('on event key')
     for (let file of files) {
       if (/\/hotload.js$/.test(file.key)) {
         file.key = KEY
@@ -19,7 +19,11 @@ export default async function ({ debug, opt }) {
     }
   })
   this.on('dep', function (files) {
-    logger.log('on event dep')
+    debug('on event dep')
+    
+    if (this.config.group.length > 0) {
+      this.config.group[0].unshift(KEY)
+    }
     for (let file of files) {
       debug(`runtime ${file.key}`)
       file.dep.unshift(KEY)

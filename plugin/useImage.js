@@ -15,7 +15,6 @@ export default async function ({ debug }) {
         let key = this.resolvePath({ path, file: file.key })
         if (!this.version.has(key)) {
           let msg = `${key} not in version`
-
           debug(new Error(msg))
           this.config.logger.error(msg, true)
         }

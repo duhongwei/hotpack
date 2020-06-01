@@ -6,7 +6,7 @@ export default async function ({ debug, opt }) {
   let { config: { logger }, fs, version } = this
 
   this.on('file', async function () {
-    logger.log('on event file')
+    debug('on event file')
     let paths = []
     for (let key in opt) {
       debug(`add  ${key}`)
@@ -34,7 +34,7 @@ export default async function ({ debug, opt }) {
     this.addPath(paths)
   })
   this.on('key', function (files) {
-    logger.log('on event key')
+    debug('on event key')
     for (let file of files) {
       if (/\/node_modules\//.test(file.key)) {
         const pathList = file.key.split('/')

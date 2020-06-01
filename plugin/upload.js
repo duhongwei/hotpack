@@ -2,6 +2,7 @@ export default async function ({ debug }) {
   let { config: { cdn }, version, util: { image2base64 } } = this
   return async function (files) {
     for (let { key, content } of files) {
+
       if (this.isPro()) {
         let url
         if (/\/inline\//.test(key)) {
@@ -9,8 +10,7 @@ export default async function ({ debug }) {
           debug(`\t ${key} => base64`)
         }
         else {
-
-          url = await cdn.upload(content, key)
+          url = await cdn.upload(content, key, version.get(key).hash)
           debug(`\t ${key} => ${url}`)
         }
         version.set({

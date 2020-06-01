@@ -1,7 +1,7 @@
 export default async function ({ debug }) {
   let { version } = this
   return async function (files) {
-    debug(files.map(file => file.key))
+    //debug(files.map(file => file.key))
     for (let file of files) {
       file.content = file.content.replace(/\bimport\s+['"](.+.html)['"]/g, (match, path) => {
 
