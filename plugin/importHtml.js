@@ -5,7 +5,7 @@ export default async function ({ debug }) {
     for (let file of files) {
       file.content = file.content.replace(/\bimport\s+['"](.+.html)['"]/g, (match, path) => {
 
-        let key = this.resolvePath({ path, file: file.key })
+        let key = this.resolveKey({ path, file: file.key })
         let url = `/${key}`
         debug(`${path}  =>  ${url}`)
         version.set({

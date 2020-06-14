@@ -1,6 +1,7 @@
 export default async function ({ debug }) {
   let { config: { cdn }, version, util: { image2base64 } } = this
   return async function (files) {
+        
     for (let { key, content } of files) {
 
       if (this.isPro()) {

@@ -1,11 +1,8 @@
-
 import { resolve, join } from 'path'
-
 export default async function ({ debug, opt }) {
-
   let { config: { logger }, fs, version } = this
 
-  this.on('file', async function () {
+  this.on('afterFile', async function () {
     debug('on event file')
     let paths = []
     for (let key in opt) {
@@ -33,30 +30,22 @@ export default async function ({ debug, opt }) {
     }
     this.addPath(paths)
   })
-  this.on('key', function (files) {
-    debug('on event key')
+  this.on('afterRead', function (files) {
+    debug('on event afterRead')
     for (let file of files) {
-      if (/\/node_modules\//.test(file.key)) {
-        const pathList = file.key.split('/')
+      if (/\/node_modules\//.test(file.path)) {
+        const pathList = file.path.split('/')
         let nodeKey = pathList[pathList.indexOf('node_modules') + 1]
+        //没有在opt里的不在这里处理
+        if(!opt[nodeKey]) continue
         const { exports = '', imports = '' } = opt[nodeKey]
-
-        file.key = `node/${nodeKey}.js`
         file.content = `
-        ${imports}
-        ${file.content}
-        ${exports}
-        `
-        debug(`${nodeKey} ${file.path} => ${file.key}`)
+          ${imports}
+          ${file.content}
+          ${exports}
+      `
+        debug(`deal ${file.path}`)
       }
-    }
-  })
-  this.addResolvePath({
-    test: /^[@a-zA-Z_].+[a-zA-Z0-9_-]$/,
-    resolve: ({ path, file }) => {
-      let key = `node/${path}.js`
-      debug(`resolve path:${path} to key:${key} in ${file}`)
-      return key
     }
   })
 

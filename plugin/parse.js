@@ -1,26 +1,30 @@
 import parser from '/home/duhongwei/parser/index.js'
 
 export default async function ({ debug }) {
-
+  const { runtimeKey } = this
   return async function (files) {
+    
     for (let file of files) {
       debug(`parse ${file.key}`)
-   
-      const es6Parser = new parser.Es6(file.content, {
-        dynamicImportReplacer: `require('runtime/import.js').load`, dynamicImportKeyConvert: path => {
 
-          let key = this.resolvePath({ path, file: file.key })
-          this.version.setDynamicDep(file.key, key)
+      const es6Parser = new parser.Es6(file.content, {
+
+        dynamicImportReplacer: `require('${runtimeKey.import}').load`, dynamicImportKeyConvert: path => {
+
+          let key = this.resolveKey({ path, file: file.key })
+          this.version.setDynamicDep({ key: file.key, dep: key })
+          debug(`\nadd dynamicDep ${key} to ${file.key}`)
           return key
+
         }
       })
       let info = null
       try {
         info = es6Parser.parse()
         for (let importInfo of info.importInfo) {
-
-          let key = this.resolvePath({ file: file.key, path: importInfo.file })
-          debug(`\nadd dep ${key} to ${file.key}`)
+          if (importInfo.type === 'djs') continue
+          let key = this.resolveKey({ file: file.key, path: importInfo.file })
+          debug(` resolve key ${importInfo.file} =>  ${key}`)
           this.version.set({ key: file.key, dep: key })
           importInfo.key = key
         }
@@ -36,5 +40,6 @@ export default async function ({ debug }) {
         file.content = info.code
       }
     }
+
   }
 }

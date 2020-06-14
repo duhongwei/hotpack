@@ -21,11 +21,11 @@ export default async function ({ debug }) {
     for (let file of files) {
       //css可以用 /inine/a.png 的方式 inline
       if (isCss(file.key)) { continue }
+      debug(`maybe inline ${file.key}`)
       file.content = file.content.replace(/\binline\(\s*([^)\s]+)\s*\)/g, (match, path) => {
         debug(`inline ${path}`)
 
-
-        let key = this.resolvePath({ path, file: file.key })
+        let key = this.resolveKey({ path, file: file.key })
         let content = null
         if (map.has(key)) {
           let item = map.get(key)
