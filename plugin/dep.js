@@ -2,6 +2,7 @@ export default async function ({ debug }) {
   let { version, config: { cdn }, util: { isCss, isJs } } = this
   const that = this
   function getHash(key) {
+    debug(version.get(key),key,1)
     let url = version.get(key).url
     return url.match(/\/([^/]+)\.(js|css)$/)[1]
   }

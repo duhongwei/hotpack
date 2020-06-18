@@ -15,7 +15,7 @@ export default async function ({ debug, opt }) {
         continue
       }
       if (!/\.(js|css)$/.test(file.key)) {
-        console
+        continue;
       }
       let result = null
       debug(`compress ${file.key}`)

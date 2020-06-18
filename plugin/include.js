@@ -4,7 +4,7 @@ export default async function ({ debug }) {
 
   function getContent(file) {
     if (isMedia(file.key)) {
-      let msg = `can not inline ${key},please use path which like '/inline/${filekey}'.`
+      let msg = `can not include ${key},please use path which like '/include/${filekey}'.`
       debug(new Error(msg))
       logger.error(msg, true)
     }
@@ -19,14 +19,15 @@ export default async function ({ debug }) {
       map.set(file.key, file)
     }
     for (let file of files) {
-      //css可以用 /inine/a.png 的方式 inline
+      //css可以用 /inine/a.png 的方式 include
       if (isCss(file.key)) { continue }
-      debug(`maybe inline ${file.key}`)
-      file.content = file.content.replace(/\binline\(\s*([^)\s]+)\s*\)/g, (match, path) => {
-        debug(`inline ${path}`)
+      debug(`maybe include ${file.key}`)
+      file.content = file.content.replace(/\binclude\(\s*([^)\s]+)\s*\)/g, (match, path) => {
+        debug(`include ${path} file is ${file.key}`)
 
         let key = this.resolveKey({ path, file: file.key })
         let content = null
+
         if (map.has(key)) {
           let item = map.get(key)
           //直接解决， 不用再写到dist了。
@@ -37,7 +38,7 @@ export default async function ({ debug }) {
           content = version.get(key).content
         }
         else {
-          let msg = `can not inline ${key},cant not find ${key}'s content`
+          let msg = `can not include ${key},cant not find ${key}'s content`
           debug(new Error(msg))
           logger.error(msg, true)
         }
