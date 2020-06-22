@@ -53,7 +53,9 @@ export default async function ({ debug }) {
         }
       })
     }
-    this.del()
+    let delFiles = this.del()
+    debug("删除的文件")
+    debug(delFiles)
 
   }
 }
