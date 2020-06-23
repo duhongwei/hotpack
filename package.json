@@ -5,9 +5,9 @@
   "description": "",
   "main": "index.js",
   "bin": {
-    "hotpack": "bin/hotpack",
-    "hotpack-pro": "bin/hotpack-pro",
-    "hotpack-dev": "bin/hotpack-dev"
+    "hotpack": "bin/hotpack.js",
+    "hotpack-pro": "bin/hotpack-pro.js",
+    "hotpack-dev": "bin/hotpack-dev.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
