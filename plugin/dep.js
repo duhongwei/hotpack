@@ -2,49 +2,14 @@ export default async function ({ debug }) {
   let { version, config: { cdn }, util: { isCss, isJs } } = this
   const that = this
   function getHash(key) {
-    debug(version.get(key),key,1)
+    debug(version.get(key), key, 1)
     let url = version.get(key).url
     return url.match(/\/([^/]+)\.(js|css)$/)[1]
   }
-  function group(list) {
 
-    let set = new Set(list)
-    let result = []
-    for (let groupItem of that.config.group) {
-      for (let item of groupItem) {
-        if (set.has(item)) {
-          result.push(groupItem)
-          break
-        }
-      }
-    }
-    set = new Set()
-    for (let groupItem of result) {
-      for (let item of groupItem) {
-        set.add(item)
-      }
-    }
-    let rest = []
-    for (let item of list) {
-      if (!set.has(item)) {
-        rest.push(item)
-      }
-    }
-    result.push(rest)
-    return result
-  }
-  function dealDep(dep) {
-
-    let cssList = dep.filter(key => isCss(key))
-    let jsList = dep.filter(key => isJs(key))
-  
-    cssList = group(cssList)
-    jsList = group(jsList)
-    debug(cssList)
-    debug(jsList)
+  function dealDep({ cssList, jsList }) {
 
     if (that.isDev()) {
-
       return {
         cssList: cssList.reduce((cur, item) => cur.concat(item), []).map(item => version.get(item).url),
         jsList: jsList.reduce((cur, item) => cur.concat(item), []).map(item => version.get(item).url)
@@ -73,30 +38,15 @@ export default async function ({ debug }) {
     }
   }
   return function (files) {
-   
-    for (let file of files) {
+
+    for (const file of files) {
       debug(`dep ${file.key}`)
-      let dep = version.getDep(file.key)
-      dep = file.dep.concat(dep)
-      let set = new Set(dep)
-      debug(dep)
-      dep = dealDep(dep)
-      file.dep = dep
-      if (version.hasDynamicDep(file.key)) {
-        debug(`dynamic dep for ${file.key}`)
-        file.dynamicDep = {}
-        for (let key of version.getDynamicDep(file.key)) {
-          let dep = version.getDep(key)
-         
-          dep = dep.filter(key => !set.has(key))
-          debug(`dynamic key ${key}`)
-          debug(dep)
-          dep = dealDep(dep)
-          file.dynamicDep[key] = [...dep.cssList, ...dep.jsList]
-         
-        }
+      file.dep = dealDep(file.dep)
+
+      for (const key in file.dynamicDep) {
+        debug(`dynamic key ${key}`)
+        file.dynamicDep[key] = dealDep(file.dynamicDep[key])
       }
     }
- 
   }
 }
