@@ -17,7 +17,7 @@ export default async function ({ debug }) {
             url = await cdn.upload(content, key)
           }
           else {
-            url = await cdn.upload(content, extname(key), { file: key })
+            url = await cdn.upload(content, extname(key), { file: key, needCompress: false })
           }
           debug(`\t ${key} => ${url}`)
         }

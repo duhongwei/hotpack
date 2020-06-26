@@ -32,6 +32,7 @@ export default async function ({ debug }) {
       cur.push(cdn.getUrl(hashList, '.js'))
       return cur
     }, [])
+   
     return {
       cssList,
       jsList
@@ -41,8 +42,9 @@ export default async function ({ debug }) {
 
     for (const file of files) {
       debug(`dep ${file.key}`)
+      debug(file.dep)
       file.dep = dealDep(file.dep)
-
+      debug(file.dep)
       for (const key in file.dynamicDep) {
         debug(`dynamic key ${key}`)
         file.dynamicDep[key] = dealDep(file.dynamicDep[key])

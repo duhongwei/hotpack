@@ -3,7 +3,7 @@ import { join } from 'path'
 
 export default async function ({ debug }) {
 
-  let { runtimeKey, version } = this
+  let { util: { isHtml }, runtimeKey, version } = this
 
   this.on('afterFile', async function () {
     debug('on event file')
@@ -27,8 +27,8 @@ export default async function ({ debug }) {
   })
   this.on('afterGroup', function (files) {
     debug('on event afterGroup')
-
     for (let file of files) {
+      //if(!isHtml(file)) continue
       debug(`runtime ${file.key}`)
       if (version.hasDynamicDep(file.key)) {
         debug(`add ${runtimeKey.import}`)
@@ -38,6 +38,7 @@ export default async function ({ debug }) {
         debug(`add ${runtimeKey.core}`)
         file.dep.jsList[0].unshift(runtimeKey.core)
       }
+      debug(file.dep)
     }
   })
 }

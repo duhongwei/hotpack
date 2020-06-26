@@ -1,5 +1,5 @@
 export default async function ({ debug }) {
-  let { version, config: { cdn }, util: { isCss, isJs } } = this
+  let { version, util: { isCss, isJs } } = this
   const that = this
   function group(list) {
 
@@ -8,7 +8,8 @@ export default async function ({ debug }) {
     for (let groupItem of that.config.group) {
       for (let item of groupItem) {
         if (set.has(item)) {
-          result.push(groupItem)
+          //必须copy再push，不然就全成一个了
+          result.push(Array.prototype.slice.call(groupItem))
           break
         }
       }
@@ -35,8 +36,6 @@ export default async function ({ debug }) {
 
     cssList = group(cssList)
     jsList = group(jsList)
-    debug(cssList)
-    debug(jsList)
 
     return {
       cssList,
@@ -51,6 +50,7 @@ export default async function ({ debug }) {
       let set = new Set(dep)
       debug(dep)
       dep = dealDep(dep)
+      debug(dep)
       file.dep = dep
       if (version.hasDynamicDep(file.key)) {
         debug(`dynamic dep for ${file.key}`)
