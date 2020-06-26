@@ -6,7 +6,7 @@ export default async function ({ debug }) {
     for (let file of files) {
       debug(`parse ${file.key}`)
       const es6Parser = new parser.Es6(file.content, {
-        dynamicImportReplacer: `require('${runtimeKey.import}').load`,
+        dynamicImportReplacer: `require("${this.runtimeKey.import}").load`,
         convertKey: path => {
           return this.resolveKey({ path, file: file.key })
         }
@@ -16,10 +16,11 @@ export default async function ({ debug }) {
         info = es6Parser.parse()
         debug('dynamic import keys：')
         debug(info.dynamicImportInfo)
-
-        this.version.setDynamicDep(info.dynamicImportInfo)
-
+        for (let { key } of info.dynamicImportInfo) {
+          this.version.setDynamicDep({ key: file.key, dep: key })
+        }
         for (let importInfo of info.importInfo) {
+
           let key = importInfo.key
           if (isHtml(key)) {
             this.version.set({ key, dep: file.key })

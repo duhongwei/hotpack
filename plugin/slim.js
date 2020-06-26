@@ -4,6 +4,7 @@ export default async function ({ debug }) {
     debug(files.map(file => file.key))
 
     for (let file of files) {
+      
       let hash = md5(file.content)
       if (version.diff(file.key, hash)) {
         version.set({ key: file.key, hash })

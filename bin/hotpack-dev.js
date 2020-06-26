@@ -14,17 +14,19 @@ program
   .option('-p,--port [port]', 'web server port')
   .option('-s --server', 'server without')
   .option('-f,--folder [folder]', 'config folder')
+ 
   .parse(process.argv)
 
 const specialConfig = {
   env: 'development',
   port: program.port || 3000,
-  isHot:false
+  isHot: false
 }
 
 if (program.clean) {
   specialConfig.clean = true
 }
+
 if (program.folder) {
   specialConfig.folder = program.folder
 }
