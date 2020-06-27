@@ -5,12 +5,18 @@ export default async function ({ debug }) {
   return async function (files) {
     for (let file of files) {
       debug(`parse ${file.key}`)
-      const es6Parser = new parser.Es6(file.content, {
-        dynamicImportReplacer: `require("${runtimeKey.import}").load`,
-        convertKey: path => {
-          return this.resolveKey({ path, file: file.key })
-        }
-      })
+      let es6Parser = null
+      try {
+        es6Parser = new parser.Es6(file.content, {
+          dynamicImportReplacer: `require("${runtimeKey.import}").load`,
+          convertKey: path => {
+            return this.resolveKey({ path, file: file.key })
+          }
+        })
+      }
+      catch (e) {
+        this.config.logger.error(`parse ${file.key} error\n ${e.message}`)
+      }
       let info = null
       try {
         info = es6Parser.parse()
