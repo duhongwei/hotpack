@@ -17,7 +17,6 @@
   "license": "ISC",
   "dependencies": {
     "@duhongwei/parser": "^3.0.1",
-    "autoprefixer": "^9.8.0",
     "buble": "^0.20.0",
     "chalk": "^4.0.0",
     "clean-css": "^4.2.3",

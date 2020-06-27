@@ -1,6 +1,6 @@
 import { extname } from 'path'
 export default async function ({ debug }) {
-  let { config: { cdn }, version, util: { isImage, image2base64 } } = this
+  let { config: { logger, cdn }, version, util: { isImage, image2base64 } } = this
   return async function (files) {
 
     for (let { key, content } of files) {
@@ -9,7 +9,7 @@ export default async function ({ debug }) {
         let url
         if (/\/inline\//.test(key) && isImage(key)) {
           url = image2base64(content)
-          debug(`\t ${key} => base64`)
+          logger.log(`\t ${key} => base64`)
         }
         else {
           //临时这样写一下，else 里面的后面会删除。
@@ -19,7 +19,7 @@ export default async function ({ debug }) {
           else {
             url = await cdn.upload(content, extname(key), { file: key, needCompress: false })
           }
-          debug(`\t ${key} => ${url}`)
+          logger.log(`\t ${key} => ${url}`)
         }
         version.set({
           key,

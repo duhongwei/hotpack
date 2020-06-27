@@ -3,13 +3,13 @@ export default async function ({ debug }) {
   const that = this
   function getHash(key) {
 
-    debug(`get hash of ${key} from ${JSON.stringify(version.get(key))}`)
+    //debug(`get hash of ${key} from ${JSON.stringify(version.get(key))}`)
     let url = version.get(key).url
     return url.match(/\/([^/]+)\.(js|css)$/)[1]
   }
 
   function dealDep({ cssList, jsList }) {
-
+    
     if (that.isDev()) {
       return {
         cssList: cssList.reduce((cur, item) => cur.concat(item), []).map(item => version.get(item).url),
