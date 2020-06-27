@@ -1,5 +1,5 @@
 export default async function ({ debug }) {
-  let { version, config: { cdn }, util: { isCss, isJs } } = this
+  let { version, config: { cdn } } = this
   const that = this
   function getHash(key) {
 

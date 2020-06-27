@@ -6,7 +6,7 @@ export default async function ({ debug }) {
 
   let { util: { format } } = this
 
-  async function render({ key, content, dynamicDep, dep: { cssList, jsList } }) {
+  async function render({content, dynamicDep, dep: { cssList, jsList } }) {
     let scripts = []
     let styles = []
 

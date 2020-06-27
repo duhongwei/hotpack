@@ -3,7 +3,7 @@ export default async function ({ debug }) {
 
   function getContent(file) {
     if (isMedia(file.key)) {
-      let msg = `can not include ${key},please use path which like '/include/${filekey}'.`
+      let msg = `can not include ${file.key},please use path which like '/image/${file.key}'.`
       debug(new Error(msg))
       logger.error(msg, true)
     }
@@ -56,7 +56,7 @@ export default async function ({ debug }) {
       })
     }
     let delFiles = this.del()
-    debug("删除的文件")
+    debug('删除的文件')
     debug(delFiles)
   })
 }
