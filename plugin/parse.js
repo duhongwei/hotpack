@@ -6,7 +6,7 @@ export default async function ({ debug }) {
     for (let file of files) {
       debug(`parse ${file.key}`)
       const es6Parser = new parser.Es6(file.content, {
-        dynamicImportReplacer: `require("${this.runtimeKey.import}").load`,
+        dynamicImportReplacer: `require("${runtimeKey.import}").load`,
         convertKey: path => {
           return this.resolveKey({ path, file: file.key })
         }

@@ -1,5 +1,5 @@
 
-(function () {
+function run() {
   var mod = require('lego').inspect();
   var hotloadKeys = require('lego').hotloadKeys
   var waitingMod = mod.waitingMod,
@@ -22,5 +22,8 @@
     message += ' missed: ' + missedMod.join(',');
     window.console && window.console.log('%c' + message, 'color:' + color);
   }
-})()
+}
+//自动执行
+run()
+export default run
 

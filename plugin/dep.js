@@ -9,7 +9,7 @@ export default async function ({ debug }) {
   }
 
   function dealDep({ cssList, jsList }) {
-    
+
     if (that.isDev()) {
       return {
         cssList: cssList.reduce((cur, item) => cur.concat(item), []).map(item => version.get(item).url),
@@ -25,17 +25,21 @@ export default async function ({ debug }) {
       cur.push(cdn.getUrl(hashList, '.css'))
       return cur
     }, [])
-
-    jsList = jsList.reduce((cur, item) => {
-      if (item.length === 0) return cur
-      let hashList = item.map(key => getHash(key))
-      if (cdn.makeFile) {
-        cdn.makeFile(hashList, '.js')
-      }
-      cur.push(cdn.getUrl(hashList, '.js'))
-      return cur
-    }, [])
-
+    //只有hotload一个js,忽略
+    if (jsList[0].length == 1 && jsList[[0][0] === that.runtimeKey.core]) {
+      jsList = []
+    }
+    else {
+      jsList = jsList.reduce((cur, item) => {
+        if (item.length === 0) return cur
+        let hashList = item.map(key => getHash(key))
+        if (cdn.makeFile) {
+          cdn.makeFile(hashList, '.js')
+        }
+        cur.push(cdn.getUrl(hashList, '.js'))
+        return cur
+      }, [])
+    }
     return {
       cssList,
       jsList

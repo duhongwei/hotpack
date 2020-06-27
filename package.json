@@ -14,21 +14,17 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "@duhongwei/parser": "^3.0.1",
-    "buble": "^0.20.0",
     "chalk": "^4.0.0",
-    "clean-css": "^4.2.3",
     "clone": "^2.1.2",
     "commander": "^5.1.0",
     "fs-extra": "9.0.1",
-    "html-minifier": "^4.0.0",
     "js-tokens": "^6.0.0",
     "koa": "^2.11.0",
     "koa-proxy": "^1.0.0-alpha.3",
     "koa-send": "^5.0.0",
-    "recursive-readdir": "^2.2.2",
-    "uglify-es": "^3.3.9"
+    "recursive-readdir": "^2.2.2"
   }
 }

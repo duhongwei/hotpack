@@ -6,16 +6,16 @@ export default async function ({ debug }) {
   let { util: { isHtml }, runtimeKey, version } = this
 
   this.on('afterFile', async function () {
-    debug('on event file')
+    debug('on event afterFile')
     let path = join(this.root, 'browser/hotload.js')
     this.addPath(path)
     path = join(this.root, 'browser/import.js')
     this.addPath(path)
   })
   this.on('afterKey', function (files) {
-    debug('on event key')
+    debug('on event afterKey')
     for (let file of files) {
-      if (/\/hotload.js$/.test(file.key)) {
+      if (/\/hotload\.js$/.test(file.key)) {
         debug(`${file.key} => ${runtimeKey.core}`)
         file.key = runtimeKey.core
       }
@@ -35,10 +35,10 @@ export default async function ({ debug }) {
         debug(`add ${runtimeKey.import}`)
         file.dep.jsList[0].unshift(runtimeKey.import)
       }
-      if (file.dep.jsList[0].length > 0) {
-        debug(`add ${runtimeKey.core}`)
-        file.dep.jsList[0].unshift(runtimeKey.core)
-      }
+
+      debug(`add ${runtimeKey.core}`)
+      file.dep.jsList[0].unshift(runtimeKey.core)
+
       debug(file.dep)
     }
   })

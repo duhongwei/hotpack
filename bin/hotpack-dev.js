@@ -12,15 +12,16 @@ program
   .usage('[options]')
   .option('-c,--clean', 'ignore file version,rebuild all files')
   .option('-p,--port [port]', 'web server port')
+  .option('-w,--watch [watch]', 'web socket port')
   .option('-s --server', 'server without')
   .option('-f,--folder [folder]', 'config folder')
- 
+
   .parse(process.argv)
 
 const specialConfig = {
   env: 'development',
   port: program.port || 3000,
-  isHot: false
+  hotPort: program.watch
 }
 
 if (program.clean) {
@@ -37,11 +38,11 @@ async function init() {
   const app = await new Spack({ config })
 
   await app.build()
-
   if (!program.server) {
     server({
       app
     })
+    app.emit('afterServer')
   }
 }
 init()

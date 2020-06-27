@@ -1,28 +1,30 @@
-/**
- * 内部调用。因为devDebug和runtime是一套
- */
-import path from 'path'
-
+import { join } from 'path'
 export default async function ({ debug }) {
 
-  const { util: { isHtml }, root, fs } = this
+  const { util: { isHtml }, runtimeKey } = this
 
-  const content = await fs.readFile(path.join(root, 'browser/debug.js'))
-
-  return async function (files) {
-    if (this.isPro()) {
-      this.config.logger.log(`skip devDebug plugin`)
-      return
+  this.on('afterFile', function () {
+    debug('on event afterFile')
+    let path = join(this.root, 'browser/debug.js')
+    this.addPath(path)
+  })
+  this.on('afterKey', function (files) {
+    debug('on event afterKey')
+    for (let file of files) {
+      if (file.key.endsWith('browser/debug.js')) {
+        debug(`${file.key} => ${runtimeKey.debug}`)
+        file.key = runtimeKey.debug
+        break
+      }
     }
+  })
+  this.on('afterGroup', function (files) {
+    debug('on event afterGroup')
     for (let file of files) {
       if (!isHtml(file.key)) continue
-      debug(`devDebug ${file.key}`)
-      file.content = file.content.replace('</body>',
-        `<script>
-           ${content}
-          </script>
-          </body>`
-      )
+
+      debug(`add ${runtimeKey.debug}`)
+      file.dep.jsList[0].push(runtimeKey.debug)
     }
-  }
+  })
 }
