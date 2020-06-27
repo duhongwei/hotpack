@@ -9,7 +9,7 @@ import postcss from 'postcss'
 import autoprefixer from 'autoprefixer'
 
 export default async function ({ debug }) {
-  return async function (files) {
+  this.on('afterSlim', function (files) {
     for (let file of files) {
       if (this.isPro()) {
         debug(`postcss ${file.key}`)
@@ -20,5 +20,5 @@ export default async function ({ debug }) {
           })
       }
     }
-  }
+  })
 }

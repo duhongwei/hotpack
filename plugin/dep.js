@@ -2,7 +2,8 @@ export default async function ({ debug }) {
   let { version, config: { cdn }, util: { isCss, isJs } } = this
   const that = this
   function getHash(key) {
-    debug(version.get(key), key, 1)
+
+    debug(`get hash of ${key} from ${JSON.stringify(version.get(key))}`)
     let url = version.get(key).url
     return url.match(/\/([^/]+)\.(js|css)$/)[1]
   }
@@ -16,6 +17,7 @@ export default async function ({ debug }) {
       }
     }
     cssList = cssList.reduce((cur, item) => {
+      if (item.length === 0) return cur
       let hashList = item.map(key => getHash(key))
       if (cdn.makeFile) {
         cdn.makeFile(hashList, '.css')
@@ -25,6 +27,7 @@ export default async function ({ debug }) {
     }, [])
 
     jsList = jsList.reduce((cur, item) => {
+      if (item.length === 0) return cur
       let hashList = item.map(key => getHash(key))
       if (cdn.makeFile) {
         cdn.makeFile(hashList, '.js')
@@ -32,7 +35,7 @@ export default async function ({ debug }) {
       cur.push(cdn.getUrl(hashList, '.js'))
       return cur
     }, [])
-   
+
     return {
       cssList,
       jsList

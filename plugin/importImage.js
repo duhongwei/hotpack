@@ -1,10 +1,12 @@
 export default async function ({ debug }) {
-  let { version, util: { isMedia }, config: { logger } } = this
-  return async function (files) {
+  let { version, util: { isMedia, isJs }, config: { logger } } = this
+  this.on('afterUploadMedia', function (files) {
+    debug('on afterUploadMedia')
     for (let file of files) {
+      if (!isJs(file.key)) continue
       file.content = file.content.replace(/\bimport\s+([\w-_]+)\s+from\s+['"](.+)['"]/g, (match, variable, path) => {
         if (!isMedia(path)) return match
-       
+
         let key = this.resolveKey({ path, file: file.key })
         let url = null
         if (this.isDev()) {
@@ -25,5 +27,5 @@ export default async function ({ debug }) {
         return result
       })
     }
-  }
+  })
 }

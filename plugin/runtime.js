@@ -28,8 +28,9 @@ export default async function ({ debug }) {
   this.on('afterGroup', function (files) {
     debug('on event afterGroup')
     for (let file of files) {
-      //if(!isHtml(file)) continue
+      if (!isHtml(file.key)) continue
       debug(`runtime ${file.key}`)
+
       if (version.hasDynamicDep(file.key)) {
         debug(`add ${runtimeKey.import}`)
         file.dep.jsList[0].unshift(runtimeKey.import)

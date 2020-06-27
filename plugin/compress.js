@@ -7,7 +7,7 @@ import htmlProvider from 'html-minifier';
 const minify = htmlProvider.minify
 
 export default async function ({ debug, opt }) {
-  this.on('beforeUpload', (files) => {
+  this.on('compress', (files) => {
     debug('on event beforeUpload')
     if (this.isDev()) return;
     for (let file of files) {
@@ -46,5 +46,5 @@ export default async function ({ debug, opt }) {
       }
       file.content = result
     }
-  })
+  }, true)
 }

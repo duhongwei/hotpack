@@ -5,7 +5,7 @@ define('runtime/import.js', function (system) {
     var deps = window._dynamic_deps_[key]
 
     if (typeof deps !== 'object') {
-      return Promise.resolve({ template: '' })
+      return Promise.resolve({ render: function () { } })
     }
     var list = []
     for (var i = 0; i < deps.length; i++) {

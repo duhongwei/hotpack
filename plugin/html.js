@@ -6,7 +6,7 @@ export default async function ({ debug }) {
 
   let { util: { format } } = this
 
-  async function render({ content, dynamicDep, dep: { cssList, jsList } }) {
+  async function render({ key, content, dynamicDep, dep: { cssList, jsList } }) {
     let scripts = []
     let styles = []
 
@@ -20,6 +20,11 @@ export default async function ({ debug }) {
     styles = styles.join('\n')
     //window._dynamic_deps_先硬编码吧。
     //页面中格式 window._dynamic_deps_={"views/login/index.vue.js":["https://s0.ssl.qhres.com/static/4e0a5cdac90a9847.css","https://s1.ssl.qhres.com/static/21d0467b73e3af4b.js"]}
+    for (let key in dynamicDep) {
+      let item = dynamicDep[key]
+      dynamicDep[key] = [...item.jsList, ...item.cssList]
+    }
+  
     let dynamics = `<script>window._dynamic_deps_=${JSON.stringify(dynamicDep)}</script>`
     if (!/\{\{js\}\}/.test(content)) {
       content = content.replace('</body>', `${scripts}\n</body>`)

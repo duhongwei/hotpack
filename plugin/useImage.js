@@ -2,9 +2,11 @@
 
 export default async function ({ debug }) {
 
-  return async function (files) {
-    
+  this.on('afterUploadMedia', function (files) {
+
     for (let file of files) {
+      if (!/\.(css|html)/.test(file.key)) continue
+      
       file.content = file.content.replace(/url\(([^)]+)\)/g, (match, path) => {
         path = path.trim().replace(/'"/g, '')
         let key = this.resolveKey({ path, file: file.key })
@@ -23,7 +25,7 @@ export default async function ({ debug }) {
         if (/^http|^\/\//.test(path)) {
           return match
         }
-       
+
         debug(`resolve ${path} file is ${file.key}`)
         let key = this.resolveKey({ path, file: file.key })
         if (!this.version.has(key)) {
@@ -37,5 +39,5 @@ export default async function ({ debug }) {
         return ` src=${url} `
       })
     }
-  }
+  })
 }
