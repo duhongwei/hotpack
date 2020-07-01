@@ -6,7 +6,7 @@ export default async function ({ debug }) {
 
   let { util: { format } } = this
 
-  async function render({content, dynamicDep, dep: { cssList, jsList } }) {
+  async function render({ content, dynamicDep, dep: { cssList, jsList } }) {
     let scripts = []
     let styles = []
 
@@ -24,15 +24,15 @@ export default async function ({ debug }) {
       let item = dynamicDep[key]
       dynamicDep[key] = [...item.jsList, ...item.cssList]
     }
-  
+
     let dynamics = `<script>window._dynamic_deps_=${JSON.stringify(dynamicDep)}</script>`
-    if (!/\{\{js\}\}/.test(content)) {
+    if (!/#\[\s*js\s*\]/.test(content)) {
       content = content.replace('</body>', `${scripts}\n</body>`)
     }
-    if (!/\{\{css\}\}/.test(content)) {
+    if (!/#\[\s*css\s*\]/.test(content)) {
       content = content.replace('</head>', `${styles}\n</head>`)
     }
-    if (!/\{\{dynamicDep\}\}/.test(content)) {
+    if (!/#\[\s*dynamics\s*\]/.test(content)) {
       content = content.replace('</head>', `${dynamics}\n</head>`)
     }
     content = format(content, {
