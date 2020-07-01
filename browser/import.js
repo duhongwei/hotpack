@@ -1,3 +1,4 @@
+/* eslint-disable */
 define('runtime/import.js', function (system) {
 
   var doc = document

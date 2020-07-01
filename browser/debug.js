@@ -1,4 +1,4 @@
-
+/* eslint-disable */
 function run() {
   var mod = require('lego').inspect();
   var hotloadKeys = require('lego').hotloadKeys
