@@ -11,16 +11,17 @@ process.env.NODE_ENV = 'development'
 program
   .usage('[options]')
   .option('-c,--clean', 'ignore file version,rebuild all files')
-  .option('-p,--port [port]', 'web server port')
-  .option('-w,--watch [watch]', 'web socket port')
-  .option('-s --server', 'server without')
   .option('-f,--folder [folder]', 'config folder')
-
+  .option('-m,--mock [mock]', 'mock port')
+  .option('-p,--port [port]', 'web server port')
+  .option('-s --server', 'server without')
+  .option('-w,--watch [watch]', 'web socket port')
   .parse(process.argv)
 
 const specialConfig = {
   env: 'development',
   port: program.port || 3000,
+  mockPort: program.mock,
   hotPort: program.watch
 }
 
