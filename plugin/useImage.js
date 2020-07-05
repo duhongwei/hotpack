@@ -6,9 +6,18 @@ export default async function ({ debug }) {
 
     for (let file of files) {
       if (!/\.(css|html)/.test(file.key)) continue
-      
+
       file.content = file.content.replace(/url\(([^)]+)\)/g, (match, path) => {
-        path = path.trim().replace(/'"/g, '')
+        path = path.trim().replace(/['"]/g, '')
+        //如果已经是网络地址了，不处理
+        if (/^http|^\/\//.test(path)) {
+          return match
+        }
+        //data url schema 不处理
+        if (/^data:/.test(path)) {
+          return match
+        }
+
         let key = this.resolveKey({ path, file: file.key })
         if (!this.version.has(key)) {
           let msg = `${key} not in version`
@@ -20,13 +29,16 @@ export default async function ({ debug }) {
         return `url(${url})`
       })
       file.content = file.content.replace(/\ssrc=['"]?([^\s>'"]+)['"]?/g, (match, path) => {
-        path = path.trim().replace(/'"/g, '')
+        path = path.trim().replace(/['"]/g, '')
         //如果已经是网络地址了，不处理
         if (/^http|^\/\//.test(path)) {
           return match
         }
+        //data url schema 不处理
+        if (/^data:/.test(path)) {
+          return match
+        }
 
-        debug(`resolve ${path} file is ${file.key}`)
         let key = this.resolveKey({ path, file: file.key })
         if (!this.version.has(key)) {
           let msg = `${key} not in version`
