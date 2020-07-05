@@ -1,5 +1,5 @@
 export default async function ({ debug }) {
-  let { version, config: { cdn } } = this
+  let { version, config: { logger, cdn } } = this
   const that = this
   function getHash(key) {
 
@@ -7,13 +7,18 @@ export default async function ({ debug }) {
     let url = version.get(key).url
     return url.match(/\/([^/]+)\.(js|css)$/)[1]
   }
-
+  function getUrl(item) {
+    if (!version.has(item)) {
+      logger.error(`no ${item}`, true)
+    }
+    return version.get(item).url
+  }
   function dealDep({ cssList, jsList }) {
 
     if (that.isDev()) {
       return {
-        cssList: cssList.reduce((cur, item) => cur.concat(item), []).map(item => version.get(item).url),
-        jsList: jsList.reduce((cur, item) => cur.concat(item), []).map(item => version.get(item).url)
+        cssList: cssList.reduce((cur, item) => cur.concat(item), []).map(getUrl),
+        jsList: jsList.reduce((cur, item) => cur.concat(item), []).map(getUrl)
       }
     }
     cssList = cssList.reduce((cur, item) => {
