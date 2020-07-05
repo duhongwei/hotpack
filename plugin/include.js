@@ -1,6 +1,9 @@
+/** 
+ * include的文件的后缀名很重要，如果是html，会把内容包装一下。
+ */
 export default async function ({ debug }) {
-  let { version, util: { isText, isMedia, isJs, isCss }, config: { logger } } = this
-
+  let { version, util: { isText, isMedia, isHtml, isJs, isCss }, config: { logger } } = this
+  const that = this
   function getContent(file) {
     if (isMedia(file.key)) {
       let msg = `can not include ${file.key},please use path which like '/image/${file.key}'.`
@@ -14,20 +17,15 @@ export default async function ({ debug }) {
   this.on('afterUpload', function (files) {
     debug('on event afterUpload')
 
-
     let map = new Map()
     for (let file of files) {
       map.set(file.key, file)
     }
-    for (let file of files) {
-      if (!isText(file.key)) continue
-      //css可以用 /inine/a.png 的方式 include
-      if (isCss(file.key)) { continue }
-      //debug(`maybe include ${file.key}`)
+    function deal(file) {
       file.content = file.content.replace(/\binclude\(\s*([^)\s]+)\s*\)/g, (match, path) => {
         debug(`include ${path} file is ${file.key}`)
 
-        let key = this.resolveKey({ path, file: file.key })
+        let key = that.resolveKey({ path, file: file.key })
         let content = null
 
         if (map.has(key)) {
@@ -44,6 +42,10 @@ export default async function ({ debug }) {
           debug(new Error(msg))
           logger.error(msg, true)
         }
+        if (!isHtml(file.key)) {
+          return content
+        }
+
         if (isJs(key)) {
           return `<script>${content}</script>`
         }
@@ -54,6 +56,25 @@ export default async function ({ debug }) {
           return content
         }
       })
+    }
+    let hasInclude = false
+    //先处理include里的include
+    let includeFiles = files.filter(item => /(^|\/)include\//.test(item.key))
+    do {
+      hasInclude = false
+      for (let file of includeFiles) {
+        if (/\binclude\(/.test(file.content)) {
+          hasInclude = true
+          deal(file)
+        }
+      }
+    } while (hasInclude)
+    for (let file of files) {
+
+      if (!isText(file.key)) continue
+      if (isCss(file.key)) { continue }
+
+      deal(file)
     }
     let delFiles = this.del()
     debug('删除的文件')
