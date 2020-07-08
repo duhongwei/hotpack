@@ -5,6 +5,7 @@ export default async function ({ debug }) {
   return async function (files) {
     for (let file of files) {
       debug(`parse ${file.key}`)
+      this.version.clearDep(file.key)
       let es6Parser = null
       try {
         es6Parser = new parser.Es6(file.content, {
@@ -22,6 +23,7 @@ export default async function ({ debug }) {
         info = es6Parser.parse()
         debug('dynamic import keys：')
         debug(info.dynamicImportInfo)
+        this.version.clearDynamicDep(file.key)
         for (let { key } of info.dynamicImportInfo) {
           this.version.setDynamicDep({ key: file.key, dep: key })
         }
