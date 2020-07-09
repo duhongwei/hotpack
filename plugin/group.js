@@ -55,7 +55,15 @@ export default async function ({ debug }) {
       if (version.hasDynamicDep(file.key)) {
         debug(`dynamic dep for ${file.key}`)
         file.dynamicDep = {}
-        for (let key of version.getDynamicDep(file.key)) {
+        let keys = null
+        try {
+          version.getDynamicDep(file.key)
+        }
+        catch (e) {
+          that.config.logger.error(e, true)
+        }
+
+        for (let key of keys) {
           let dep = version.getDep(key)
 
           dep = dep.filter(key => !set.has(key))
