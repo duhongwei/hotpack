@@ -57,7 +57,7 @@ export default async function ({ debug }) {
         file.dynamicDep = {}
         let keys = null
         try {
-          version.getDynamicDep(file.key)
+          keys = version.getDynamicDep(file.key)
         }
         catch (e) {
           that.config.logger.error(e, true)
