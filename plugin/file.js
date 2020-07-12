@@ -1,6 +1,7 @@
 
 export default async function ({ debug }) {
   return async function () {
+    
     if (this.isHot() && this.hotPath) {
       this.filePaths = [this.hotPath]
     }

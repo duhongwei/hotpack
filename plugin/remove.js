@@ -16,6 +16,7 @@ export default async function ({ debug }) {
 
     for (let key of keys) {
       if (/^(other|runtime)\//.test(key)) continue
+   
       if (!fileSet.has(key)) {
         delete versionData[key]
         debug(`del key ${key} `)

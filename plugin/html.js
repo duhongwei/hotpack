@@ -44,11 +44,36 @@ export default async function ({ debug }) {
   }
 
   return async function (files) {
-
     for (let file of files) {
       debug(`html ${file.key}`)
-      file.content = await render(file)
 
+      file.content = await render(file)
     }
+
+    let allMap = this.version.getAllMap()
+    debug(allMap)
+    for (let file of files) {
+      if (allMap[file.key]) {
+        let mapKeys = allMap[file.key]
+
+        if (mapKeys.length > 1) {
+          for (let key of mapKeys) {
+            debug(`transform ${file.key} => ${key}`)
+            this.addFile({
+              key,
+              content: file.content
+            })
+          }
+          file.del = true
+        }
+        else {
+          debug(`transform ${file.key} => ${mapKeys[0]}`)
+          file.key = mapKeys[0]
+        }
+
+      }
+    }
+    this.del()
+
   }
 }
