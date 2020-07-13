@@ -4,7 +4,8 @@ export default async function ({ debug }) {
   const { runtimeKey, util: { isHtml } } = this
   return async function (files) {
     for (let file of files) {
-      if (/\.min\.js$/.test(file.key)) continue
+      //min的文件可能也手动添加 了export
+      //if (/\.min\.js$/.test(file.key)) continue
       debug(`parse ${file.key}`)
       this.version.clearDep(file.key)
 
