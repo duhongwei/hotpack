@@ -1,5 +1,5 @@
-# hotpack book
-
+# hotpack
+`hotpack` 是一个web 打包器
 # 自我介绍
 
 ## 特色
