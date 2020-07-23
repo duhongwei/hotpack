@@ -15,11 +15,11 @@ export default async function ({ debug }) {
         else {
           let v = version.get(key)
           if (!v) {
-            logger.error(`${key} in version is empty`, true)
+            logger.error(new Error(`${key} in version is empty`), true)
           }
           url = v.url
           if (!url) {
-            logger.error(`${key} has not url property`, true)
+            logger.error(new Error(`${key} has not url property`), true)
           }
         }
         let result = `var ${variable}="${url}";`

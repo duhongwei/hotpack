@@ -17,7 +17,11 @@ export default async function ({ debug }) {
             url = await cdn.upload(content, key)
           }
           else {
-            url = await cdn.upload(content, extname(key), { file: key, needCompress: false })
+            let needCompress = true
+            if (key.endsWith('.min.js')) {
+              needCompress = false
+            }
+            url = await cdn.upload(content, extname(key), { file: key, needCompress: true })
           }
           logger.log(`\t ${key} => ${url}`)
         }
@@ -34,5 +38,6 @@ export default async function ({ debug }) {
         debug(`\t ${key} => /${key}`)
       }
     }
+    await this.fs.writeFile(this.config.versionPath, this.version.get())
   }
 }
