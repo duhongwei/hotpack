@@ -38,6 +38,6 @@ export default async function ({ debug }) {
         debug(`\t ${key} => /${key}`)
       }
     }
-    await this.fs.writeFile(this.config.versionPath, this.version.get())
+    //await this.fs.writeFile(this.config.versionPath, this.version.get())
   }
 }
