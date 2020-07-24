@@ -30,4 +30,10 @@
 
 其实还有一些特色，比如 `import xxx.html` 的写法，这些在后面的介绍中会陆续提到。
 
-[更多信息请查看 hotpack book](https://duhongwei.gitbooks.io/hotpack/)
+TODO
+1 代码整理
+2 测试用例
+3 发布1.0版本
+4 发布示例
+5 发布示例插件
+6 帮助文档
