@@ -21,7 +21,7 @@ export default async function ({ debug }) {
             if (key.endsWith('.min.js')) {
               needCompress = false
             }
-            url = await cdn.upload(content, extname(key), { file: key, needCompress: true })
+            url = await cdn.upload(content, extname(key), { file: key, needCompress })
           }
           logger.log(`\t ${key} => ${url}`)
         }
