@@ -41,7 +41,7 @@ define('runtime/import.js', function (system) {
     return new Promise(function (resolve, reject) {
       var timeoutHandler = setTimeout(function () {
         reject(new Error('timeout'))
-      }, 3000)
+      }, 10000)
 
       var node = doc.createElement('link');
       node.rel = 'stylesheet';
@@ -64,7 +64,7 @@ define('runtime/import.js', function (system) {
     return new Promise(function (resolve, reject) {
       var timeoutHandler = setTimeout(function () {
         reject(new Error('timeout'))
-      }, 3000)
+      }, 10000)
       var script = doc.createElement('script');
       script.onerror = function (e) {
         reject(e.message)
