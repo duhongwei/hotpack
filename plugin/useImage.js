@@ -72,10 +72,14 @@ export default async function ({ debug }) {
         if (/^data:/.test(path)) {
           return match
         }
+        //已经被前面的替换处理过了。
+        if (/^\/__cdn__\//.test(path)) {
+          return match
+        }
         try {
           let key = this.resolveKey({ path, file: file.key })
           if (!this.version.has(key)) {
-            let msg = `${key} not in version`
+            let msg = `${key} not in version, path is  ${path},key is ${file.key}`
             debug(new Error(msg))
             this.config.logger.error(msg, true)
           }
@@ -91,7 +95,7 @@ export default async function ({ debug }) {
       })
       if (file.html) {
         file.html = file.html.replace(/['"][^'"]+\.(png|jpg|gif|svg|jpeg)['"]/g, (match) => {
-          
+
           let wrap = '"'
           if (match.startsWith("'")) {
             wrap = "'"

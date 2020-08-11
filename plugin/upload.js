@@ -2,33 +2,48 @@ import { extname } from 'path'
 export default async function ({ debug }) {
   let { config: { logger, cdn }, version, util: { isImage, image2base64 } } = this
   return async function (files) {
-
+    let promiseList = []
     for (let { key, content } of files) {
-
       if (this.isPro()) {
-        let url
+
         if (/\/inline\//.test(key) && isImage(key)) {
-          url = image2base64(content)
+          let url = image2base64(content)
+          version.set({
+            key,
+            url
+          })
           logger.log(`\t ${key} => base64`)
         }
         else {
           //临时这样写一下，else 里面的后面会删除。
           if (cdn.isLocal) {
-            url = await cdn.upload(content, key)
+            let url = await cdn.upload(content, key)
+            version.set({
+              key,
+              url
+            })
           }
           else {
+
             let needCompress = true
             if (key.endsWith('.min.js')) {
               needCompress = false
             }
-            url = await cdn.upload(content, extname(key), { file: key, needCompress })
+
+            promiseList.push(
+              cdn.upload(content, extname(key), { file: key, needCompress }).then((url) => {
+                logger.log(`\t ${key} => ${url}`)
+                version.set({
+                  key,
+                  url
+                })
+              })
+            )
+
           }
-          logger.log(`\t ${key} => ${url}`)
+
         }
-        version.set({
-          key,
-          url
-        })
+
       }
       else {
         version.set({
@@ -38,6 +53,7 @@ export default async function ({ debug }) {
         debug(`\t ${key} => /${key}`)
       }
     }
+    await Promise.all(promiseList)
     //await this.fs.writeFile(this.config.versionPath, this.version.get())
   }
 }
