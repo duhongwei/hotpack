@@ -1,3 +1,4 @@
+import { md5 } from "../lib/util.js"
 
 
 export default async function ({ debug }) {
@@ -90,6 +91,7 @@ export default async function ({ debug }) {
       })
       if (file.html) {
         file.html = file.html.replace(/['"][^'"]+\.(png|jpg|gif|svg|jpeg)['"]/g, (match) => {
+          
           let wrap = '"'
           if (match.startsWith("'")) {
             wrap = "'"
@@ -120,9 +122,12 @@ export default async function ({ debug }) {
             process.exit(1)
           }
         })
+        //这块对vue做下特殊处理，不得不与vue插件耦合，暂时没想到更好的处理办法。
+        file.content = file.content.replace(/__vue__:"[^"]+"/, function () {
+          return `__vue__:"${md5(file.html)}"`
+        })
       }
     }
 
   })
 }
-
