@@ -22,9 +22,10 @@ export default async function ({ debug }) {
     debug('on event afterGroup')
     for (let file of files) {
       if (!isHtml(file.key)) continue
-
-      debug(`add ${runtimeKey.debug}`)
-      file.dep.jsList[0].push(runtimeKey.debug)
+      if (file.dep.jsList[0].length > 0) {
+        debug(`add ${runtimeKey.debug}`)
+        file.dep.jsList[0].push(runtimeKey.debug)
+      }
     }
   })
 }

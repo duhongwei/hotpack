@@ -35,10 +35,11 @@ export default async function ({ debug }) {
         debug(`add ${runtimeKey.import}`)
         file.dep.jsList[0].unshift(runtimeKey.import)
       }
-
-      debug(`add ${runtimeKey.core}`)
-      file.dep.jsList[0].unshift(runtimeKey.core)
-
+      
+      if (file.dep.jsList[0].length > 0) {
+        debug(`add ${runtimeKey.core}`)
+        file.dep.jsList[0].unshift(runtimeKey.core)
+      }
       debug(file.dep)
     }
   })
