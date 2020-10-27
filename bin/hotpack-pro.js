@@ -7,21 +7,24 @@ import Config from '../lib/Config.js'
 import Spack from '../lib/Spack.js'
 
 process.env.NODE_ENV = 'production'
-
+process.env.test = 0
 program
   .usage('[options]')
   .option('-c,--clean', 'ignore file version,rebuild all files')
   .option('-p,--port [port]', 'web server port')
   .option('-s --server', 'server without')
   .option('-f,--folder [folder]', 'config folder')
+  .option('-t,--test', 'test or not')
   .parse(process.argv)
 
 const specialConfig = {
   env: 'production',
   port: program.port || 3000,
-  isHot:false
+  isHot: false
 }
-
+if (program.test) {
+  process.env.test = 1
+}
 if (program.clean) {
   specialConfig.clean = true
 }
