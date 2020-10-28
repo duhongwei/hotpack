@@ -7,7 +7,7 @@ import Config from '../lib/Config.js'
 import Spack from '../lib/Spack.js'
 
 process.env.NODE_ENV = 'development'
-
+process.env.test = 1
 program
   .usage('[options]')
   .option('-c,--clean', 'ignore file version,rebuild all files')
@@ -16,6 +16,7 @@ program
   .option('-p,--port [port]', 'web server port')
   .option('-s --server', 'server without')
   .option('-w,--watch [watch]', 'web socket port')
+
   .parse(process.argv)
 
 const specialConfig = {
