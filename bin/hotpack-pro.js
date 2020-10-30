@@ -15,6 +15,7 @@ program
   .option('-s --server', 'server without')
   .option('-f,--folder [folder]', 'config folder')
   .option('-t,--test', 'test or not')
+  .option('-d,--dist [dist]', 'destination directory')
   .parse(process.argv)
 
 const specialConfig = {
@@ -22,6 +23,7 @@ const specialConfig = {
   port: program.port || 3000,
   isHot: false
 }
+
 if (program.test) {
   process.env.test = 1
 }
@@ -30,6 +32,9 @@ if (program.clean) {
 }
 if (program.folder) {
   specialConfig.folder = program.folder
+}
+if (program.dist) {
+  specialConfig.dist = program.dist
 }
 async function init() {
   const c = new Config(specialConfig)
