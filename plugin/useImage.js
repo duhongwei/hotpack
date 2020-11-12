@@ -1,4 +1,4 @@
-import { md5 } from "../lib/util.js"
+import { isMedia, md5 } from "../lib/util.js"
 
 
 export default async function ({ debug }) {
@@ -30,18 +30,21 @@ export default async function ({ debug }) {
         debug(`${key} => ${url}`)
         return `url(${url})`
       })
-      file.content = file.content.replace(/(\b|:)src=['"]?([^\s>'"]+)['"]?/g, (match, match1, path) => {
+      //可以匹配 this.src=javascript: src='a.jpg' 
+      file.content = file.content.replace(/(\b|:)src\s*=\s*['"]?([^\s>'",}]+)['"]?/g, (match, match1, path) => {
         if (match1 == ':') return match
         path = path.trim().replace(/['"]/g, '')
         //如果已经是网络地址了，不处理
         if (/^http|^\/\//.test(path)) {
           return match
         }
-        //data url schema 不处理
-        if (/^data:/.test(path)) {
+
+        //如果不是图片字体等资源，不处理
+        if (!isMedia(path)) {
           return match
         }
         try {
+
           let key = this.resolveKey({ path, file: file.key })
           if (!this.version.has(key)) {
             let msg = `${key} not in version`
@@ -54,7 +57,8 @@ export default async function ({ debug }) {
           return ` src=${url} `
         }
         catch (e) {
-          console.log(file.content)
+          console.error(`${file.key} error`)
+          console.log(e)
           process.exit(1)
         }
       })
@@ -89,7 +93,8 @@ export default async function ({ debug }) {
           return `${wrap}${url}${wrap}`
         }
         catch (e) {
-          console.log(file.content)
+          console.error(`${file.key} error`)
+          console.log(e)
           process.exit(1)
         }
       })
@@ -122,7 +127,8 @@ export default async function ({ debug }) {
             return `${wrap}${url}${wrap}`
           }
           catch (e) {
-            console.log(file.content)
+            console.error(`${file.key} error`)
+            console.log(e)
             process.exit(1)
           }
         })
