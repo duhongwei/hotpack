@@ -4,7 +4,7 @@ export default async function ({ debug }) {
   const { runtimeKey, util: { isHtml } } = this
   return async function (files) {
     for (let file of files) {
-      //min的文件可能也手动添加 了export
+      //min的文件可能也手动添加了export
       //if (/\.min\.js$/.test(file.key)) continue
       debug(`parse ${file.key}`)
       this.version.clearDep(file.key)
@@ -31,6 +31,16 @@ export default async function ({ debug }) {
         this.version.clearDynamicDep(file.key)
         for (let { key } of info.dynamicImportInfo) {
           this.version.setDynamicDep({ key: file.key, dep: key })
+        }
+        
+        for (let importInfo of info.importInfo) {
+          let key = importInfo.key
+          if (isHtml(key)) {
+            if (key.includes('=>')) {
+              let htmlKey = key.split(/\s*=>\s*/)[0]
+              this.version.clearMap(htmlKey)
+            }
+          }
         }
         for (let importInfo of info.importInfo) {
 
