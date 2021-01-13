@@ -19,7 +19,10 @@ export default async function ({ debug }) {
         if (/^data:/.test(path)) {
           return match
         }
-
+        //如果path里有变量，不处理
+        if (/\$\{[^}]+\}/.test(path)) {
+          return match
+        }
         let key = this.resolveKey({ path, file: file.key })
         if (!this.version.has(key)) {
           let msg = `${key} not in version`
@@ -31,7 +34,7 @@ export default async function ({ debug }) {
         return `url(${url})`
       })
       //可以匹配 this.src=javascript: src='a.jpg' 
-      file.content = file.content.replace(/(\b|:)src\s*=\s*['"]?([^\s>'",}]+)['"]?/g, (match, match1, path) => {
+      file.content = file.content.replace(/(\b|:)src\s*=\s*(['"])?([^\s>'",}]+)['"]?/g, (match, match1, match2, path) => {
         if (match1 == ':') return match
         path = path.trim().replace(/['"]/g, '')
         //如果已经是网络地址了，不处理
@@ -43,6 +46,7 @@ export default async function ({ debug }) {
         if (!isMedia(path)) {
           return match
         }
+
         try {
 
           let key = this.resolveKey({ path, file: file.key })
@@ -54,7 +58,7 @@ export default async function ({ debug }) {
           let url = this.version.get(key).url
 
           debug(`${key} => ${url}`)
-          return ` src=${url} `
+          return `src=${match2}${url}${match2}`
         }
         catch (e) {
           console.error(`${file.key} error`)
