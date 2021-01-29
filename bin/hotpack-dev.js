@@ -15,6 +15,7 @@ program
   .option('-m,--mock [mock]', 'mock port')
   .option('-p,--port [port]', 'web server port')
   .option('-s --server', 'server without')
+  .option('-r --render', 'render by server')
   .option('-w,--watch [watch]', 'web socket port')
 
   .parse(process.argv)
@@ -33,13 +34,17 @@ if (program.clean) {
 if (program.folder) {
   specialConfig.folder = program.folder
 }
+if (program.render) {
+  specialConfig.render = true
+}
+
 async function init() {
-  const c = new Config(specialConfig)
-  const config = await c.getDev()
-
-  const app = await new Spack({ config })
-
+  let app = null
+  let config = await new Config(specialConfig).getDev()
+  
+  app = await new Spack({ config})
   await app.build()
+
   if (!program.server) {
     server({
       app

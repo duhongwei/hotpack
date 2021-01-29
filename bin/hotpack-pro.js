@@ -16,6 +16,7 @@ program
   .option('-f,--folder [folder]', 'config folder')
   .option('-t,--test', 'test or not')
   .option('-d,--dist [dist]', 'destination directory')
+  .option('-r --render', 'render by server')
   .parse(process.argv)
 
 const specialConfig = {
@@ -36,18 +37,22 @@ if (program.folder) {
 if (program.dist) {
   specialConfig.dist = program.dist
 }
+if (program.render) {
+  specialConfig.render = true
+}
 async function init() {
-  const c = new Config(specialConfig)
-  const config = await c.getPro()
+  let app = null
+  let config = await new Config(specialConfig).getPro()
 
-  const app = await new Spack({ config })
-
+  app = await new Spack({ config })
   await app.build()
 
   if (program.server) {
     server({
       app
     })
+    // app.emit('afterServer')
   }
 }
 init()
+

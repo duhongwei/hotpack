@@ -23,7 +23,22 @@ export default async function ({ debug }) {
         if (/\$\{[^}]+\}/.test(path)) {
           return match
         }
-        let key = this.resolveKey({ path, file: file.key })
+        if (!isMedia(path)) {
+          return match
+        }
+        let key = null
+        // try {
+        key = this.resolveKey({ path, file: file.key })
+        // }
+        /* catch (e) {
+          console.log(e)
+          console.log()
+          console.log(path, file.key)
+          console.log()
+          console.log(file.content)
+          console.log()
+          process.exit(1)
+        } */
         if (!this.version.has(key)) {
           let msg = `${key} not in version`
           debug(new Error(msg))
@@ -51,6 +66,7 @@ export default async function ({ debug }) {
 
           let key = this.resolveKey({ path, file: file.key })
           if (!this.version.has(key)) {
+
             let msg = `${key} not in version`
             debug(new Error(msg))
             this.config.logger.error(msg, true)
@@ -102,6 +118,8 @@ export default async function ({ debug }) {
           process.exit(1)
         }
       })
+
+      //为了兼容以前的版，暂时先留着
       if (file.html) {
         file.html = file.html.replace(/['"][^'"]+\.(png|jpg|gif|svg|jpeg)['"]/g, (match) => {
 
