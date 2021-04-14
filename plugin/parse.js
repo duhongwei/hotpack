@@ -4,12 +4,15 @@ export default async function ({ debug }) {
   const { runtimeKey, util: { isHtml } } = this
   return async function (files) {
     for (let file of files) {
+      
       //min的文件可能也手动添加了export
       //if (/\.min\.js$/.test(file.key)) continue
       debug(`parse ${file.key}`)
       this.version.clearDep(file.key)
 
       let es6Parser = null
+
+     
       try {
         es6Parser = new parser.Es6(file.content, {
           dynamicImportReplacer: `require("${runtimeKey.import}").load`,
@@ -20,10 +23,13 @@ export default async function ({ debug }) {
       }
       catch (e) {
         this.config.logger.error(`parse ${file.key} error\n ${e.message}`)
+
       }
       let info = null
+      
       try {
         info = es6Parser.parse()
+       
         if (info.dynamicImportInfo.length > 0) {
           debug('dynamic import keys：')
           debug(info.dynamicImportInfo)
@@ -68,7 +74,7 @@ export default async function ({ debug }) {
       catch (e) {
         debug(e)
         this.config.logger.error(e.message)
-
+     
       }
       if (info) {
         file.importInfo = info.importInfo

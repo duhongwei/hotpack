@@ -9,7 +9,7 @@ export default async function ({ debug }) {
   }
   function getUrl(item) {
     if (!version.has(item)) {
-      logger.error(`no ${item}`, true)
+      logger.error(`no ${item}，或许应该检查配置中的 group 项`, true)
     }
     return version.get(item).url
   }

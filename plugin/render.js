@@ -41,7 +41,7 @@ export default async function () {
     if (key.endsWith('.css')) {
       return ''
     }
-    //node
+    //node，正好直接用
     if (/^[a-wA-W]/.test(key)) {
       return match
     }
@@ -49,14 +49,20 @@ export default async function () {
     if (match.includes('/other/')) {
       return ''
     }
-
+    //浏览器专用
+    if (key.endsWith('.b.js') || key.endsWith('.b.min.js')) {
+      return ''
+    }
     match = dealPath(match)
 
     return match
   }
-  return async function (files) {
 
+  //---------------------------------
+  return async function (files) {
     if (config.render) {
+      //记录html和controller的对应关系
+      let dist = {}
       let serverFiles = []
       for (let file of files) {
         if (!isJs(file.key)) {
@@ -65,15 +71,28 @@ export default async function () {
         if (file.key.startsWith('node')) {
           continue
         }
+        //忽略浏览器专用文件 
+        if (file.key.endsWith('.b.js') || file.key.endsWith('.b.min.js')) {
+          continue
+        }
+        let content = file.content
+        //过滤 =>html, html只能独占一行 
+        /*  content = content.replace(/^\s*import\s+\S+\s*=>\s*\S+/mg, '');
+         
+         content = content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/mg, (match, key) => {
+           return resolve(match, key)
+         }) */
+        let path = join(config.render.dist, file.key)
+        content = content.replace(/^\s*import\s+['"]([-_\w\d]+?\.html)['"];?/, (match, htmlPath) => {
+          dist[htmlPath] = path
+          return ''
+        });
 
-        let content = file.content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/mg, (match, key) => {
-
+        content = content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/mg, (match, key) => {
           return resolve(match, key)
-
         })
 
-        let path = join(config.render.dist, file.key)
-        if (file.key.endsWith('.server.js')) {
+        if (file.key.endsWith('.server.js') || file.key.endsWith('.s.js')) {
           file.del = true
         }
         serverFiles.push(this.fs.writeFile(path, content))
@@ -81,10 +100,12 @@ export default async function () {
       await Promise.all(serverFiles).catch(e => {
         console.error(e)
       })
+      dist['env'] = config.env
+      await this.fs.writeFile(join(config.dist, 'ssr.json'), dist)
     }
     else {
       for (let file of files) {
-        if (file.key.endsWith('.server.js')) {
+        if (file.key.endsWith('.server.js') || file.key.endsWith('.s.js')) {
           file.del = true
         }
       }
