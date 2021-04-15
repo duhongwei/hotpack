@@ -83,10 +83,14 @@ export default async function () {
            return resolve(match, key)
          }) */
         let path = join(config.render.dist, file.key)
-        content = content.replace(/^\s*import\s+['"]([-_\w\d]+?\.html)['"];?/, (match, htmlPath) => {
-          dist[htmlPath] = path
+        content = content.replace(/^\s*import\s+["'](\S+)\s*=>\s*(\S+)["'];?/, (match, from, to) => {
+          from = join(file.key, '../', from)
+          //htmlkey 寻找 render js，用于pre-ssr
+          dist[from] = path
+          //web路径 ，寻找 render js 用于ssr
+          dist[to] = path
           return ''
-        });
+        })
 
         content = content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/mg, (match, key) => {
           return resolve(match, key)
