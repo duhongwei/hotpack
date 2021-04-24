@@ -60,6 +60,7 @@ export default async function ({ debug }) {
           keys = version.getDynamicDep(file.key)
         }
         catch (e) {
+         
           that.config.logger.error(e, true)
         }
 

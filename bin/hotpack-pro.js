@@ -6,7 +6,9 @@ import server from '../lib/server.js'
 import Config from '../lib/Config.js'
 import Spack from '../lib/Spack.js'
 
+//打包，生产环境
 process.env.NODE_ENV = 'production'
+//是否使用测试接口，生产环境也可以 使用测试接口测试
 process.env.test = 0
 program
   .usage('[options]')
@@ -16,7 +18,7 @@ program
   .option('-f,--folder [folder]', 'config folder')
   .option('-t,--test', 'test or not')
   .option('-d,--dist [dist]', 'destination directory')
-  .option('-r --render', 'render by server')
+  .option('-r --render [dist]', 'render by server')
   .parse(process.argv)
 
 const specialConfig = {
@@ -38,8 +40,18 @@ if (program.dist) {
   specialConfig.dist = program.dist
 }
 if (program.render) {
-  specialConfig.render = true
+  specialConfig.renderEnabled = true
+  /**
+   * 发布到服务器或docker的时候，绝对路径是不一样的，需要替换预计编译时的绝对路径
+   * 所以只有发布的时候才会这样写  形如 hotpack -r /app/_render_
+   */
+  if (typeof program.render == 'string') {
+    specialConfig.render = {
+      publishPath: program.render
+    }
+  }
 }
+
 async function init() {
   let app = null
   let config = await new Config(specialConfig).getPro()
@@ -51,7 +63,6 @@ async function init() {
     server({
       app
     })
-    // app.emit('afterServer')
   }
 }
 init()

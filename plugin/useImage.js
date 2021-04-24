@@ -1,165 +1,115 @@
+/**
+ * 并没有用解析语法，只是简单的用正则。这种并不严谨，可能会出错，但目前来看够用了。
+ * 在开发的时候，可能会有一点限制，毕竟正则有不方便处理的地方。
+ * 
+ * 总体来说就两类，一类是带引号的 "xxx.jpg"，和可以 不带引号的，src=xxx url(xxx)
+ * 
+ * warning
+ * 1 因为是简正则，所以被注释掉的代码也会被匹配
+ * 2 :src="a+'xx.jpg"  在vue 模板中这样写，会被匹配到，但无法替换。会报找不到key的错误
+ */
 import { isMedia, md5 } from "../lib/util.js"
 
-
 export default async function ({ debug }) {
-
+  const that = this
   this.on('afterUploadMedia', function (files) {
-
     for (let file of files) {
-      if (file.key.endsWith('.min.js')) continue
-      if (!/\.(css|html|js)/.test(file.key)) continue
-      //这块写了四次，需要合并，后面有时间再说。
+
+      //对于压缩过的文件 ，正则可能失败，所以忽略压缩的文件，而且一般来说，压缩过的都是不需要再处理的
+      if (file.key.endsWith('.min.js') || file.key.endsWith('.min.css')) continue
+
+      //只处理css,html,js这三类文件，不全面，但也够用了，后面需要再加。可以不加到这里，可以 用另外插件的形式，监听 afterUploadMedia 事件即可，
+      if (!/\.(css|html|js)$/.test(file.key)) continue
+
+      /**
+       * 处理带引号的 形如 ‘xx.jpg' ，如何两边单引号不一样也行
+       * 
+       * warning
+       * :src="a+'xx.jpg"  在vue 模板中这样写，会被匹配到，但无法替换。
+       * 
+       */
+      file.content = file.content.replace(/['"][^'"]+\.(jpg|jpeg|png|gif|webp|svg|eot|ttf|woff|woff2|etf|mp3|mp4|mpeg)[^'"]*['"]/g, (match) => {
+      
+        let quote = match[0]
+
+        let path = match.replace(/['"]/g, '')
+        path = normalize(path)
+        if (!shouldReplace(path)) {
+          return match
+        }
+        let url = replace(path, file)
+        
+        return `${quote}${url}${quote}`
+      })
+      /**
+       * 处理所有不带引号的 url(xxx) 
+       * 1. 背景图片
+       * 2. 字体
+      */
       file.content = file.content.replace(/url\(([^)]+)\)/g, (match, path) => {
-        path = path.trim().replace(/['"]/g, '')
-        //如果已经是网络地址了，不处理
-        if (/^http|^\/\//.test(path)) {
+        path = normalize(path)
+        if (!shouldReplace(path)) {
           return match
         }
-        //data url schema 不处理
-        if (/^data:/.test(path)) {
-          return match
-        }
-        //如果path里有变量，不处理
-        if (/\$\{[^}]+\}/.test(path)) {
-          return match
-        }
-        if (!isMedia(path)) {
-          return match
-        }
-        let key = null
-        // try {
-        key = this.resolveKey({ path, file: file.key })
-        // }
-        /* catch (e) {
-          console.log(e)
-          console.log()
-          console.log(path, file.key)
-          console.log()
-          console.log(file.content)
-          console.log()
-          process.exit(1)
-        } */
-        if (!this.version.has(key)) {
-          let msg = `${key} not in version`
-          debug(new Error(msg))
-          this.config.logger.error(msg, true)
-        }
-        let url = this.version.get(key).url
-        debug(`${key} => ${url}`)
+        let url = replace(path, file)
         return `url(${url})`
       })
-      //可以匹配 this.src=javascript: src='a.jpg' 
-      file.content = file.content.replace(/(\b|:)src\s*=\s*(['"])?([^\s>'",}]+)['"]?/g, (match, match1, match2, path) => {
-        if (match1 == ':') return match
-        path = path.trim().replace(/['"]/g, '')
-        //如果已经是网络地址了，不处理
-        if (/^http|^\/\//.test(path)) {
+
+      /**
+       * 处理所有不带引号的 src=xxx,因为 js,vue 中的src 必须带引号，所以这里的特指 html 中的src
+      */
+      file.content = file.content.replace(/\bsrc\s*=\s*([\w0-9.?#]+)/g, (match, path) => {
+        path = normalize(path)
+        if (!shouldReplace(path)) {
           return match
         }
-
-        //如果不是图片字体等资源，不处理
-        if (!isMedia(path)) {
-          return match
-        }
-
-        try {
-
-          let key = this.resolveKey({ path, file: file.key })
-          if (!this.version.has(key)) {
-
-            let msg = `${key} not in version`
-            debug(new Error(msg))
-            this.config.logger.error(msg, true)
-          }
-          let url = this.version.get(key).url
-
-          debug(`${key} => ${url}`)
-          return `src=${match2}${url}${match2}`
-        }
-        catch (e) {
-          console.error(`${file.key} error`)
-          console.log(e)
-          process.exit(1)
-        }
+        let url = replace(path, file)
+        return `src=(${url})`
       })
-      file.content = file.content.replace(/['"][^'"]+\.(png|jpg|gif|svg|jpeg)['"]/g, (match) => {
-        let wrap = '"'
-        if (match.startsWith("'")) {
-          wrap = "'"
-        }
-        let path = match.trim().replace(/['"]/g, '')
-        //如果已经是网络地址了，不处理
-        if (/^http|^\/\//.test(path)) {
-          return match
-        }
-        //data url schema 不处理
-        if (/^data:/.test(path)) {
-          return match
-        }
-        //已经被前面的替换处理过了。
-        if (/^\/__cdn__\//.test(path)) {
-          return match
-        }
-        try {
-          let key = this.resolveKey({ path, file: file.key })
-          if (!this.version.has(key)) {
-            let msg = `${key} not in version, path is  ${path},key is ${file.key}`
-            debug(new Error(msg))
-            this.config.logger.error(msg, true)
-          }
-          let url = this.version.get(key).url
+    }
+  })
+  //去掉后面的 ？#,对于唯一标识(md5)的资源来说，这些没有意义，还影响判断
+  function normalize(path) {
+    return path.split(/[?#]/)[0]
+  }
+  //--------------
+  //判断是否是一个需要替换的资源
+  function shouldReplace(path) {
+    //如果已经是网络地址了，不处理
+    if (/^http|^\/\//.test(path)) {
+      return false
+    }
+    //已经被hotpack处理过了，不处理
+    if (/^\/__cdn__\//.test(path)) {
+      return false
+    }
+    //data url schema 不处理
+    if (/^data:/.test(path)) {
+      return false
+    }
+    //如果path里有变量，不处理
+    if (/\$\{[^}]+\}/.test(path)) {
+      return false
+    }
+    //不是白名单中的资源，不处理，这样会误杀，但会保证可用性和安全性
+    if (!isMedia(path)) {
+      return false
+    }
+    return true
+  }
+  function replace(path, file) {
 
-          debug(`${key} => ${url}`)
-          return `${wrap}${url}${wrap}`
-        }
-        catch (e) {
-          console.error(`${file.key} error`)
-          console.log(e)
-          process.exit(1)
-        }
-      })
+    let key = that.resolveKey({ path, file: file.key })
 
-      //为了兼容以前的版，暂时先留着
-      if (file.html) {
-        file.html = file.html.replace(/['"][^'"]+\.(png|jpg|gif|svg|jpeg)['"]/g, (match) => {
-
-          let wrap = '"'
-          if (match.startsWith("'")) {
-            wrap = "'"
-          }
-          let path = match.trim().replace(/['"]/g, '')
-          //如果已经是网络地址了，不处理
-          if (/^http|^\/\//.test(path)) {
-            return match
-          }
-          //data url schema 不处理
-          if (/^data:/.test(path)) {
-            return match
-          }
-          try {
-            let key = this.resolveKey({ path, file: file.key })
-            if (!this.version.has(key)) {
-              let msg = `${key} not in version ${file.key}`
-              debug(new Error(msg))
-              this.config.logger.error(msg, true)
-            }
-            let url = this.version.get(key).url
-
-            debug(`${key} => ${url}`)
-            return `${wrap}${url}${wrap}`
-          }
-          catch (e) {
-            console.error(`${file.key} error`)
-            console.log(e)
-            process.exit(1)
-          }
-        })
-        //这块对vue做下特殊处理，不得不与vue插件耦合，暂时没想到更好的处理办法。
-        file.content = file.content.replace(/__vue__:"[^"]+"/, function () {
-          return `__vue__:"${md5(file.html)}"`
-        })
-      }
+    if (!that.version.has(key)) {
+      let msg = `${key} not in version, path is  ${path},key is ${file.key}`
+      console.error(new Error(msg))
+      process.exit(1)
     }
 
-  })
+    let url = that.version.get(key).url
+    debug(`${key} => ${url}`)
+    return url
+  }
+
 }
