@@ -1,8 +1,8 @@
 
-import { join, normalize } from 'path'
+import { join } from 'path'
 
 export default async function () {
-  const { config, util: { isJs }, fs } = this
+  const { config, util: { isJs }, fs,version } = this
   let publishFiles = []
   /**
    * 已经完成 预渲染了，把需要发布的文件写操作，覆盖原来用于预渲染的文件 
@@ -27,6 +27,7 @@ export default async function () {
     if (!config.renderEnabled) {
       return
     }
+    
     let fileList = files.filter(file => {
       if (!isJs(file.key)) {
         return false
@@ -41,14 +42,6 @@ export default async function () {
       return true
     })
     await relate(fileList)
-    /*  if (config.render.publishPath) {
-       for (let file of fileList) {
-         publishFiles.push({
-           key: file.key,
-           content: file.content
-         })
-       }
-     } */
     publishFiles = fileList
     let saveFiles = await dealImport(fileList, config.render.dist)
     await save(saveFiles)
@@ -61,10 +54,14 @@ export default async function () {
       'env': config.env,
       'test': process.env.test
     }
+   
     for (let file of files) {
+   
       if (isServerFile(file)) {
+     
         //必须得有 /m 因为这样才能每行都匹配，否则只匹配最开始的一行      
         file.content = file.content.replace(/^\s*import\s+["'](\S+)\s*=>\s*(\S+)["'];?/m, (match, from, to) => {
+         
           from = join(file.key, '../', from)
 
           //htmlkey 寻找 render js，用于pre-ssr
@@ -92,7 +89,7 @@ export default async function () {
           }
           //node，正好直接用
           if (/^[a-wA-W]/.test(key)) {
-            return match
+              return  match
           }
           //other目录用的是前端用的js，服务端用不到
           //先注释，不用的js用 .b.js结尾
@@ -106,6 +103,7 @@ export default async function () {
 
           return match.replace(/['"](.+?)['"]/, (match, path) => {
             if (path.endsWith('.vue')) {
+              
               path = `${path}.js`
             }
             //处理省略写法
@@ -117,14 +115,15 @@ export default async function () {
                 path = `${path}.js`
               }
             }
+            let result=path
             //为了处理这个绝对路径，代价很大，但我还是觉得值得
             if (path.startsWith('/')) {
               //let dist='/app/_render_/'
-              return normalize(`"${dist}${path}"`)
+              result= `${dist}${path}`
             }
-            else {
-              return normalize(`"${path}"`)
-            }
+            
+            result = `"${result}"`
+            return result
           })
         })
       }

@@ -19,7 +19,8 @@ export default async function ({ debug }) {
     let keys = Object.keys(versionData)
 
     for (let key of keys) {
-      if (/^(other|runtime)\//.test(key)) continue
+      //other后面可以去掉，只有 node 文件 和 runtime 文件不是从src中读的
+      if (/^(node|other|runtime)\//.test(key)) continue
    
       if (!fileSet.has(key)) {
      

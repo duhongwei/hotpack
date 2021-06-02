@@ -13,7 +13,7 @@ program
   .usage('[options]')
   .option('-c,--clean', 'ignore file version,rebuild all files')
   .option('-f,--folder [folder]', 'config folder')
-  .option('-m,--mock [mock]', 'mock port')
+  //.option('-m,--mock [mock]', 'mock port')
   .option('-p,--port [port]', 'web server port')
   .option('-s --server', 'server without')
   .option('-r --render', 'render by server')
@@ -54,7 +54,7 @@ async function init() {
     server({
       app
     })
-    app.emit('afterServer')
+    //app.emit('afterServer')
   }
 }
 init()

@@ -3,7 +3,7 @@ export default async function ({ debug }) {
   let { config: { logger, cdn }, version, util: { isImage, image2base64 } } = this
   return async function (files) {
     let promiseList = []
-    for (let { key, content } of files) {
+    for (let { key, content,meta } of files) {
       if (this.isPro()) {
 
         if (/\/inline\//.test(key) && isImage(key)) {
@@ -29,7 +29,9 @@ export default async function ({ debug }) {
             if (key.endsWith('.min.js')) {
               needCompress = false
             }
-
+            if (meta && meta.isMin) {
+              needCompress = false
+            }
             promiseList.push(
               cdn.upload(content, extname(key), { file: key, needCompress }).then((url) => {
                 logger.log(`\t ${key} => ${url}`)

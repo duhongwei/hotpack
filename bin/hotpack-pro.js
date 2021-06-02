@@ -8,7 +8,9 @@ import Spack from '../lib/Spack.js'
 
 //打包，生产环境
 process.env.NODE_ENV = 'production'
-//是否使用测试接口，生产环境也可以 使用测试接口测试
+global.__VUE_OPTIONS_API__ = true
+global.__VUE_PROD_DEVTOOLS__ = false
+//是否使用测试接口，生产环境也可以使用测试接口测试，默认使用生产环境接口
 process.env.test = 0
 program
   .usage('[options]')
@@ -65,5 +67,6 @@ async function init() {
     })
   }
 }
+
 init()
 

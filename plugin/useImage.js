@@ -12,9 +12,9 @@ import { isMedia, md5 } from "../lib/util.js"
 
 export default async function ({ debug }) {
   const that = this
+
   this.on('afterUploadMedia', function (files) {
     for (let file of files) {
-
       //对于压缩过的文件 ，正则可能失败，所以忽略压缩的文件，而且一般来说，压缩过的都是不需要再处理的
       if (file.key.endsWith('.min.js') || file.key.endsWith('.min.css')) continue
 
@@ -22,23 +22,23 @@ export default async function ({ debug }) {
       if (!/\.(css|html|js)$/.test(file.key)) continue
 
       /**
-       * 处理带引号的 形如 ‘xx.jpg' ，如何两边单引号不一样也行
+       * 处理带引号的 形如 ‘xx.jpg' ，如果两边单引号不一样也行
+       * 路径必须以http,或 . 或 / 开头
        * 
        * warning
        * :src="a+'xx.jpg"  在vue 模板中这样写，会被匹配到，但无法替换。
        * 
        */
-      file.content = file.content.replace(/['"][^'"]+\.(jpg|jpeg|png|gif|webp|svg|eot|ttf|woff|woff2|etf|mp3|mp4|mpeg)[^'"]*['"]/g, (match) => {
-      
-        let quote = match[0]
+      file.content = file.content.replace(/['"](http|\.|\/)[^'"]+\.(jpg|jpeg|png|gif|webp|svg|eot|ttf|woff|woff2|etf|mp3|mp4|mpeg)([?#].+)?['"]/g, (match) => {
 
+        let quote = match[0]
         let path = match.replace(/['"]/g, '')
         path = normalize(path)
         if (!shouldReplace(path)) {
           return match
         }
         let url = replace(path, file)
-        
+   
         return `${quote}${url}${quote}`
       })
       /**
@@ -47,8 +47,11 @@ export default async function ({ debug }) {
        * 2. 字体
       */
       file.content = file.content.replace(/url\(([^)]+)\)/g, (match, path) => {
+        path = path.replace(/['"]/g, '')
+        path = path.trim()
         path = normalize(path)
         if (!shouldReplace(path)) {
+
           return match
         }
         let url = replace(path, file)
@@ -102,6 +105,7 @@ export default async function ({ debug }) {
     let key = that.resolveKey({ path, file: file.key })
 
     if (!that.version.has(key)) {
+      
       let msg = `${key} not in version, path is  ${path},key is ${file.key}`
       console.error(new Error(msg))
       process.exit(1)
