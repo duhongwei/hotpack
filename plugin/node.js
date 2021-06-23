@@ -202,9 +202,11 @@ export default async function ({ debug }) {
 
         version.set({ key, hash })
         let hited = false
-        content = content.replace(/define.amd(.{1,2})define\(([^)]+)\)/, (match, part1, part2) => {
+        content = content.replace(/define.amd(.{1,3})define\(([^)]+)\)/, (match, part1, part2) => {
+            
             hited = true
             let info = part2.split(',')
+
             //拿到 factory，在最后一个参数
             let factory = info.reverse()[0]
             let deps = []
