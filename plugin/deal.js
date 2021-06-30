@@ -3,7 +3,7 @@ export default async function ({ debug }) {
     return async function (files) {
         for (let file of files) {
             this.version.clearDynamicDep(file.key)
-
+          
             for (let { key } of file.dynamicImportInfo) {
                 this.version.setDynamicDep({ key: file.key, dep: key })
             }

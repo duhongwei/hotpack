@@ -25,7 +25,7 @@ export default async function ({ debug }) {
       file.content = file.content.replace(/\binclude\(\s*([^)\s]+)\s*\)/g, (match, path) => {
         debug(`include ${path} file is ${file.key}`)
 
-        let key = that.resolveKey({ path, file: file.key })
+        let key = that.getKeyFromWebPath({ path, file: file.key })
         let content = null
 
         if (map.has(key)) {

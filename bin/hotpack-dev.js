@@ -54,7 +54,7 @@ async function init() {
     server({
       app
     })
-    //app.emit('afterServer')
+    app.emit('afterServer')
   }
 }
 init()

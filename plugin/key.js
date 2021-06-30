@@ -5,10 +5,8 @@ export default async function () {
 
     for (let file of files) {
 
-      file.key = this.resolvePath(file.path, this.config.src)
+      file.key = this.getKeyFromPhysicalPath(file.path, this.config.src)
      
-
-
     }
   }
   

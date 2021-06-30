@@ -102,7 +102,7 @@ export default async function ({ debug }) {
   }
   function replace(path, file) {
 
-    let key = that.resolveKey({ path, file: file.key })
+    let key = that.getKeyFromWebPath({ path, file: file.key })
 
     if (!that.version.has(key)) {
       

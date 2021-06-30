@@ -16,7 +16,7 @@ export default async function ({ debug }) {
         es6Parser = new parser.Es6(file.content, {
           dynamicImportReplacer: `require("${runtimeKey.import}").load`,
           convertKey: path => {
-            return this.resolveKey({ path, file: file.key })
+            return this.getKeyFromWebPath({ path, file: file.key })
           }
         })
       }

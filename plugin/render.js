@@ -58,12 +58,12 @@ export default async function () {
     for (let file of files) {
    
       if (isServerFile(file)) {
-     
+       
         //必须得有 /m 因为这样才能每行都匹配，否则只匹配最开始的一行      
         file.content = file.content.replace(/^\s*import\s+["'](\S+)\s*=>\s*(\S+)["'];?/m, (match, from, to) => {
          
           from = join(file.key, '../', from)
-
+         
           //htmlkey 寻找 render js，用于pre-ssr
           dist[from] = join(config.render.dist, file.key)
           //web路径 ，寻找 render js 用于ssr
@@ -87,8 +87,8 @@ export default async function () {
           if (key.endsWith('.css')) {
             return ''
           }
-          //node，正好直接用
-          if (/^[a-wA-W]/.test(key)) {
+          //node，正好直接用,@是具有全名空间的模块
+          if (/^[a-wA-W@]/.test(key)) {
               return  match
           }
           //other目录用的是前端用的js，服务端用不到
@@ -139,7 +139,6 @@ export default async function () {
 
       return fs.writeFile(join(config.render.dist, file.key), file.content)
     })
-
     await Promise.all(list)
   }
   /**
