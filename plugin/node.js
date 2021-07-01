@@ -16,7 +16,7 @@ export default async function ({ debug }) {
         let cssFiles = []
         for (let file of files) {
 
-            if (!isJs(file.key)) continue
+            if (!isJs(file.path)) continue
             
             // ^\s* 是为了云掉 //import 这种 ,还是加 m 因为加 了 ^所以需要加 m不然只匹配第一行
             await this.util.replace(file.content, /^\s*import\s+['"]([_\w].+?\.css)['"]/mg, async (match, key) => {
@@ -31,9 +31,9 @@ export default async function ({ debug }) {
                 let relatePath = getCssRelate(c)
                 
                 await loadRelate(key, relatePath);
-                //以后考虑可以 不加path，没什么大用。
+             
                 this.addFile({
-                    key: `node/${key}`,
+                    path: `node/${key}`,
                     content: c
                 })
                 return match
