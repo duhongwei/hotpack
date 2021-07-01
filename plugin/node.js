@@ -11,15 +11,16 @@ const nodeRoot = join(process.cwd(), 'node_modules')
 export default async function ({ debug }) {
     const { util: { md5, isJs, isMedia }, version } = this
     const that = this
-    //beforekey是在vue等其它插件完成转换后
+
     this.on('beforeKey', async function (files) {
         let cssFiles = []
         for (let file of files) {
 
-            if (!isJs(file.path)) continue
+            if (!isJs(file.key)) continue
+            
             // ^\s* 是为了云掉 //import 这种 ,还是加 m 因为加 了 ^所以需要加 m不然只匹配第一行
             await this.util.replace(file.content, /^\s*import\s+['"]([_\w].+?\.css)['"]/mg, async (match, key) => {
-
+                
                 let from = join(nodeRoot, key)
                 //同样的node css可能 被 多次引用 ，引用一次即可
                 if (this.files.some(item => item.path == from)) {
@@ -32,7 +33,7 @@ export default async function ({ debug }) {
                 await loadRelate(key, relatePath);
                 //以后考虑可以 不加path，没什么大用。
                 this.addFile({
-                    path: from,
+                    key: `node/${key}`,
                     content: c
                 })
                 return match

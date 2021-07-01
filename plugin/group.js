@@ -52,15 +52,18 @@ export default async function ({ debug }) {
       dep = dealDep(dep)
       debug(dep)
       file.dep = dep
+    
       if (version.hasDynamicDep(file.key)) {
+     
         debug(`dynamic dep for ${file.key}`)
         file.dynamicDep = {}
         let keys = null
         try {
+         
           keys = version.getDynamicDep(file.key)
         }
         catch (e) {
-         
+          
           that.config.logger.error(e, true)
         }
 

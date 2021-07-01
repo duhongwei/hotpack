@@ -15,6 +15,7 @@ export default async function ({ debug }) {
 
   this.on('afterUploadMedia', function (files) {
     for (let file of files) {
+    
       //对于压缩过的文件 ，正则可能失败，所以忽略压缩的文件，而且一般来说，压缩过的都是不需要再处理的
       if (file.key.endsWith('.min.js') || file.key.endsWith('.min.css')) continue
 
