@@ -31,9 +31,9 @@ export default async function ({ debug }) {
                 let relatePath = getCssRelate(c)
                 
                 await loadRelate(key, relatePath);
-             
+         
                 this.addFile({
-                    path: `node/${key}`,
+                    path: from,
                     content: c
                 })
                 return match
