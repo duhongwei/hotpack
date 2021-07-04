@@ -10,8 +10,7 @@ import Spack from '../lib/Spack.js'
 process.env.NODE_ENV = 'production'
 global.__VUE_OPTIONS_API__ = true
 global.__VUE_PROD_DEVTOOLS__ = false
-//是否使用测试接口，生产环境也可以使用测试接口测试，默认使用生产环境接口
-process.env.test = 0
+process.env.DATA_ENV = 'production'
 program
   .usage('[options]')
   .option('-c,--clean', 'ignore file version,rebuild all files')
@@ -30,7 +29,7 @@ const specialConfig = {
 }
 
 if (program.test) {
-  process.env.test = 1
+  process.env.DATA_ENV = 'test'
 }
 if (program.clean) {
   specialConfig.clean = true
