@@ -23,10 +23,10 @@ export default async function () {
     for (let file of files) {
 
       if (isServerFile(file)) {
-
+        
         //必须得有 /m 因为这样才能每行都匹配，否则只匹配最开始的一行      
         file.content = file.content.replace(/^\s*import\s+["'](\S+)\s*=>\s*(\S+)["'];?/m, (match, from, to) => {
-
+        
           from = join(file.key, '../', from)
 
           //htmlkey 寻找 render js，用于pre-ssr

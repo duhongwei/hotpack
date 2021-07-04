@@ -8,14 +8,12 @@ export default async function () {
 
 
     return async function (files) {
-        if (!config.renderEnabled) return
 
-        if (config.render.publishPath) {
+        if (config.renderEnabled && config.render.publishPath) {
             let publishFiles = getSsrFile(files)
             let fileList = await dealImport(publishFiles, config.render.publishPath)
             await save(fileList)
         }
-
         //从 files中 删除 服务端文件，避免后面的 browser端的解析出错
         for (let file of files) {
             if (isServerFile(file)) {

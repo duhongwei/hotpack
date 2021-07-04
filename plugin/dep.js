@@ -31,7 +31,7 @@ export default async function ({ debug }) {
       return cur
     }, [])
     //只有hotload一个js,忽略
-    if (jsList[0].length == 1 && jsList[[0][0] === that.runtimeKey.core]) {
+    if (jsList[0].length == 1 && jsList[[0][0] === that.config.runtimeKey.core]) {
       jsList = []
     }
     else {

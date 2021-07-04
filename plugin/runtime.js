@@ -3,7 +3,7 @@ import { join } from 'path'
 
 export default async function ({ debug }) {
 
-  let { util: { isHtml }, runtimeKey, version } = this
+  let { util: { isHtml }, config: { runtimeKey }, version } = this
 
   this.on('afterPath', async function () {
     debug('on event afterPath')

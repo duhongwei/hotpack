@@ -1,7 +1,7 @@
 import parser from '@duhongwei/parser'
 
 export default async function ({ debug }) {
-  const { runtimeKey, util: { isHtml } } = this
+  const { config: { runtimeKey }, util: { isHtml } } = this
   return async function (files) {
     for (let file of files) {
 
@@ -27,9 +27,9 @@ export default async function ({ debug }) {
       }
       //返回值应该统一，有的时候返回 数组，有的时候是对象，是不对的。
       let info = es6Parser.parse()
-       
-      file.importInfo = info.importInfo||[]
-      file.exportInfo = info.exportInfo||[]
+
+      file.importInfo = info.importInfo || []
+      file.exportInfo = info.exportInfo || []
       file.dynamicImportInfo = info.dynamicImportInfo || []
       if (info) {
         if (info.code) {
@@ -37,7 +37,7 @@ export default async function ({ debug }) {
         }
         else {
           //没有内容的文件删除
-          file.del=true
+          file.del = true
         }
       }
       else {
