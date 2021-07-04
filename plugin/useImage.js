@@ -9,7 +9,7 @@
  * 2 :src="a+'xx.jpg"  在vue 模板中这样写，会被匹配到，但无法替换。会报找不到key的错误
  * 3 字符串中的图片可能也会被匹配到，但其实不应该被匹配
  */
-import { isMedia, md5 } from "../lib/util.js"
+import { isMedia } from '../lib/util.js'
 
 export default async function ({ debug }) {
   const that = this

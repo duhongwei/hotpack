@@ -1,7 +1,7 @@
 import parser from '@duhongwei/parser'
 
 export default async function ({ debug }) {
-  const { config: { runtimeKey }, util: { isHtml } } = this
+  const { config: { runtimeKey } } = this
   return async function (files) {
     for (let file of files) {
 
