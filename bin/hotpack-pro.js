@@ -22,33 +22,35 @@ program
   .option('-r --render [dist]', 'render by server')
   .parse(process.argv)
 
+const options = program.opts();
+
 const specialConfig = {
   env: 'production',
-  port: program.port || 3000,
+  port: options.port || 3000,
   isHot: false
 }
 
-if (program.test) {
+if (options.test) {
   process.env.DATA_ENV = 'test'
 }
-if (program.clean) {
+if (options.clean) {
   specialConfig.clean = true
 }
-if (program.folder) {
-  specialConfig.folder = program.folder
+if (options.folder) {
+  specialConfig.folder = options.folder
 }
-if (program.dist) {
-  specialConfig.dist = program.dist
+if (options.dist) {
+  specialConfig.dist = options.dist
 }
-if (program.render) {
+if (options.render) {
   specialConfig.renderEnabled = true
   /**
    * 发布到服务器或docker的时候，绝对路径是不一样的，需要替换预计编译时的绝对路径
    * 所以只有发布的时候才会这样写  形如 hotpack -r /app/_render_
    */
-  if (typeof program.render == 'string') {
+  if (typeof options.render == 'string') {
     specialConfig.render = {
-      publishPath: program.render
+      publishPath: options.render
     }
   }
 }
@@ -60,7 +62,7 @@ async function init() {
   app = await new Spack({ config })
   await app.build()
 
-  if (program.server) {
+  if (options.server) {
     server({
       app
     })

@@ -20,24 +20,26 @@ program
 
   .parse(process.argv)
 
+const options = program.opts();
+
 const specialConfig = {
   env: 'development',
-  port: program.port || 3000,
-  mockPort: program.mock,
-  hotPort: program.watch
+  port: options.port || 3000,
+  mockPort: options.mock,
+  hotPort: options.watch
 }
-if (program.test) {
+if (options.test) {
   process.env.DATA_ENV = 'test'
 }
 
-if (program.clean) {
+if (options.clean) {
   specialConfig.clean = true
 }
 
-if (program.folder) {
-  specialConfig.folder = program.folder
+if (options.folder) {
+  specialConfig.folder = options.folder
 }
-if (program.render) {
+if (options.render) {
   specialConfig.renderEnabled = true
 }
 
@@ -48,7 +50,7 @@ async function init() {
   app = await new Spack({ config })
   await app.build()
 
-  if (!program.server) {
+  if (!options.server) {
     server({
       app
     })
