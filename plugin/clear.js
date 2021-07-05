@@ -1,5 +1,5 @@
 /**
- * js css,media 都会上传静床，就没用了，删除
+ * js css,media 都会上传cdn，就没用了，删除
  */
 export default async function ({ debug }) {
   const { util: { isInclude,isMedia } } = this

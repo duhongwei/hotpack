@@ -1,8 +1,7 @@
 import { dealImport, isServerFile, getSsrFile } from '../lib/ssr.js'
 import { join } from 'path'
-/**
- * 已经完成 预渲染了，把需要发布的文件写操作，覆盖原来用于预渲染的文件 
- */
+
+//已经完成 预渲染了，把需要发布的文件写操作，覆盖原来用于预渲染的文件 
 export default async function () {
   const { config, fs } = this
 

@@ -3,7 +3,7 @@
  * 只在当前node_module中查找,和其它的方案不同，并不会通过cmd或esm入口来加载模块
  * 
  * warning
- * 查找的方法就是靠试，找现成的，所以可能找不到,感叹！有一个统一的标准是多么的重要
+ * 没有统一的规范，查找的方法就是靠试，找现成的，所以可能找不到。出于效率的考虑，并没有调用其它工具来生成js，这时需要手动配置一下路径
  */
 import { resolve, join } from 'path'
 
@@ -12,10 +12,10 @@ export default async function ({ debug }) {
   const { util: { md5, isJs, isMedia }, version } = this
   const that = this
 
-  this.on('afterRead', async function (files) {
+  this.on('afterComment', async function (files) {
 
     for (let file of files) {
-
+    
       if (!isJs(file.path)) continue
 
       // ^\s* 是为了云掉 //import 这种 ,还是加 m 因为加 了 ^所以需要加 m不然只匹配第一行
@@ -44,7 +44,6 @@ export default async function ({ debug }) {
   //声明 amd,这样才能直接用 umd，因为hotload.js模块管理并不完全符合adm标准，所以默认 define.amd=undefined
   this.on('afterKey', function (files) {
     for (let file of files) {
-
       if (/\/hotload\.js$/.test(file.key)) {
         file.content = `${file.content};window.define.amd=true`
       }

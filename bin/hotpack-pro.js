@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import program from 'commander'
-
 import server from '../lib/server.js'
 import Config from '../lib/Config.js'
 import Spack from '../lib/Spack.js'
@@ -10,6 +9,7 @@ import Spack from '../lib/Spack.js'
 process.env.NODE_ENV = 'production'
 global.__VUE_OPTIONS_API__ = true
 global.__VUE_PROD_DEVTOOLS__ = false
+//数据接口，发布的时候默认使用生产接口，发布的时候也可以使用测试接口 test 可选值有 development,test,production
 process.env.DATA_ENV = 'production'
 program
   .usage('[options]')

@@ -3,6 +3,7 @@
  * 
  * 不光是要删除没有的文件，还要从version.json中删除相应的key，和相应的依赖
  * 
+ * 暂时未启用这个插件
  */
 export default async function ({ debug }) {
 

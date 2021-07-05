@@ -3,9 +3,8 @@ export default async function ({ debug }) {
   let { config: { logger, cdn }, version, util: { isImage, image2base64 } } = this
   return async function (files) {
     let promiseList = []
-    for (let { key, content,meta } of files) {
+    for (let { key, content, meta } of files) {
       if (this.isPro()) {
-
         if (/\/inline\//.test(key) && isImage(key)) {
           let url = image2base64(content)
           version.set({
@@ -41,11 +40,8 @@ export default async function ({ debug }) {
                 })
               })
             )
-
           }
-
         }
-
       }
       else {
         version.set({
@@ -56,6 +52,5 @@ export default async function ({ debug }) {
       }
     }
     await Promise.all(promiseList)
-    //await this.fs.writeFile(this.config.versionPath, this.version.get())
   }
 }

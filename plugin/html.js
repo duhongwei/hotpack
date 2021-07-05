@@ -1,6 +1,5 @@
 /**
  * 内部调用，排序放在所有插件之后，外部不以调用。
- * @param {} param0 
  */
 export default async function ({ debug }) {
 

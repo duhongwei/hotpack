@@ -1,5 +1,7 @@
+/**
+ * 暂时未启用这个插件
+ */
 import { join, sep } from 'path'
-
 export default async function () {
   function isHidden(file) {
     return file.split(sep).reverse()[0].startsWith('.')

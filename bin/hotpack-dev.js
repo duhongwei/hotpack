@@ -5,13 +5,12 @@ import Config from '../lib/Config.js'
 import Spack from '../lib/Spack.js'
 //开发环境
 process.env.NODE_ENV = 'development'
-//数据接口，开发的时候默认使用开发接口，开发的时候也可以使用测试接口 development,test,production
+//数据接口，开发的时候默认使用开发接口，开发的时候也可以使用测试接口 test 可选值有 development,test,production
 process.env.DATA_ENV = 'development'
 program
   .usage('[options]')
   .option('-c,--clean', 'ignore file version,rebuild all files')
   .option('-f,--folder [folder]', 'config folder')
-  //.option('-m,--mock [mock]', 'mock port')
   .option('-p,--port [port]', 'web server port')
   .option('-s --server', 'server without')
   .option('-r --render', 'render by server')
