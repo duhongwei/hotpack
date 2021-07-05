@@ -12,7 +12,7 @@ export default async function ({ debug }) {
   const { util: { md5, isJs, isMedia }, version } = this
   const that = this
 
-  this.on('beforeKey', async function (files) {
+  this.on('afterRead', async function (files) {
 
     for (let file of files) {
 
