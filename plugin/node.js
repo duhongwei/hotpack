@@ -6,10 +6,9 @@
  * 没有统一的规范，查找的方法就是靠试，找现成的，所以可能找不到。出于效率的考虑，并没有调用其它工具来生成js，这时需要手动配置一下路径
  */
 import { resolve, join } from 'path'
-
 const nodeRoot = join(process.cwd(), 'node_modules')
 export default async function ({ debug }) {
-  const { util: { md5, isJs, isMedia }, version } = this
+  const { util: { md5, isJs, isMedia, joinKey }, version } = this
   const that = this
 
   this.on('afterComment', async function (files) {
@@ -19,7 +18,7 @@ export default async function ({ debug }) {
       if (!isJs(file.path)) continue
 
       // ^\s* 是为了云掉 //import 这种 ,还是加 m 因为加 了 ^所以需要加 m不然只匹配第一行
-      await this.util.replace(file.content, /^\s*import\s+['"]([_\w].+?\.css)['"]/mg, async (match, key) => {
+      await this.util.replace(file.content, /^\s*import\s+['"]([\w@].+?\.css)['"]/mg, async (match, key) => {
 
         let from = join(nodeRoot, key)
         //同样的node css可能 被 多次引用 ，引用一次即可
@@ -33,7 +32,7 @@ export default async function ({ debug }) {
         await loadRelate(key, relatePath);
 
         this.addFile({
-          path: from,
+          key: `node/${key}`,
           content: c
         })
         return match
@@ -125,14 +124,15 @@ export default async function ({ debug }) {
    * warning:
    * 样式中 import这种先不管了。样式中引用样式先不管
    */
-  async function loadRelate(key, pathList) {
-    for (let path of pathList) {
-      let from = join(nodeRoot, key, '..', path)
-      //let to = join(this.config.dist, 'node', key, '..', path)
-      const content = await that.fs.readFile(from)
+  async function loadRelate(fileKey, pathList) {
+    for (let webPath of pathList) {
+      let from = join(nodeRoot, fileKey, '..', webPath)
 
+      const content = await that.fs.readFile(from)
+      let key = joinKey({ fileKey, webPath })
+      key = `node/${key}`
       that.addFile({
-        path: from,
+        key,
         content
       })
     }

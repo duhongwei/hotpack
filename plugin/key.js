@@ -6,7 +6,7 @@ export default async function () {
     for (let file of files) {
       //有key了就不用再生成key了。在之前补充的path可能会自带key
       if('key' in file) continue
-      file.key = this.getKeyFromPhysicalPath(file.path, this.config.src)
+      file.key = this.getKeyFromPhysicalPath(file.path)
     
     }
   }
