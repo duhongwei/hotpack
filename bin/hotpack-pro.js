@@ -19,7 +19,7 @@ program
   .option('-f,--folder [folder]', 'config folder')
   .option('-t,--test', 'test or not')
   .option('-d,--dist [dist]', 'destination directory')
-  .option('-r --render [dist]', 'render by server')
+  .option('-r --render', 'render by server')
   .parse(process.argv)
 
 const options = program.opts();
@@ -44,15 +44,7 @@ if (options.dist) {
 }
 if (options.render) {
   specialConfig.renderEnabled = true
-  /**
-   * 发布到服务器或docker的时候，绝对路径是不一样的，需要替换预计编译时的绝对路径
-   * 所以只有发布的时候才会这样写  形如 hotpack -r /app/_render_
-   */
-  if (typeof options.render == 'string') {
-    specialConfig.render = {
-      publishPath: options.render
-    }
-  }
+  
 }
 
 async function init() {

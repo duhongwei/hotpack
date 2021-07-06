@@ -103,11 +103,11 @@ export default async function ({ debug }) {
     return true
   }
   function replace(path, file) {
-
+ 
     let key = that.getKeyFromWebPath({ webPath: path, fileKey: file.key })
-
+    
     if (!that.version.has(key)) {
-      throw new Error(`${key} not in version, path is  ${path},key is ${file.key}`)
+      throw new Error(`key ${key} not in version, path is  ${path},key is ${file.key}`)
     }
     let url = that.version.get(key).url
     debug(`${key} => ${url}`)

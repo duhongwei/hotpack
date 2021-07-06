@@ -1,10 +1,10 @@
 
 import { join } from 'path'
-import { getSsrFile, dealImport, isServerFile } from '../lib/ssr.js'
+import { getSsrFile, getRelatePath, isServerFile,isBrowserFile } from '../lib/ssr.js'
 export default async function () {
 
   const { config, ssr, fs } = this
-
+  const that=this
   return async function (files) {
     if (!config.renderEnabled) {
       return
@@ -12,10 +12,43 @@ export default async function () {
     let fileList = getSsrFile(files)
     await relate(fileList)
 
-    let saveFiles = await dealImport(fileList, config.render.dist)
+    let saveFiles = await dealImport(fileList, config.src)
     await save(saveFiles)
   }
 
+  //处理普通import
+  async function dealImport(files) {
+    return files.map(file => {
+      return {
+        key: file.key,
+        content: file.content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/smg, (match, key) => {
+          //删除css引用 
+          if (key.endsWith('.css')) {
+            return ''
+          }
+          //node，正好直接用,@是具有全名空间的模块
+          if (/^[\w@]/.test(key)) {
+            return match
+          }
+          //删除浏览器专用
+          if (isBrowserFile({ key })) {
+            return ''
+          }
+
+          return match.replace(/['"](.+?)['"]/, (match, path) => {
+       
+            let result = that.dealSuffix(path)
+            result = getRelatePath(file.key,result)
+            result = `"${result}"`
+           
+            return result
+          })
+        })
+      }
+    })
+
+  }
+ 
   //html文件 和render js的关系
   async function relate(files) {
 
