@@ -16,7 +16,7 @@ export default async function ({ debug }) {
 
   this.on('afterUploadMedia', function (files) {
     for (let file of files) {
-    
+
       //对于压缩过的文件 ，正则可能失败，所以忽略压缩的文件，而且一般来说，压缩过的都是不需要再处理的
       if (file.key.endsWith('.min.js') || file.key.endsWith('.min.css')) continue
 
@@ -40,7 +40,7 @@ export default async function ({ debug }) {
           return match
         }
         let url = replace(path, file)
-   
+
         return `${quote}${url}${quote}`
       })
       /**
@@ -104,15 +104,11 @@ export default async function ({ debug }) {
   }
   function replace(path, file) {
 
-    let key = that.getKeyFromWebPath({ path, file: file.key })
+    let key = that.getKeyFromWebPath({ webPath: path, fileKey: file.key })
 
     if (!that.version.has(key)) {
-      
-      let msg = `${key} not in version, path is  ${path},key is ${file.key}`
-      console.error(new Error(msg))
-      process.exit(1)
+      throw new Error(`${key} not in version, path is  ${path},key is ${file.key}`)
     }
-
     let url = that.version.get(key).url
     debug(`${key} => ${url}`)
     return url

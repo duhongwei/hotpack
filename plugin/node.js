@@ -15,7 +15,7 @@ export default async function ({ debug }) {
   this.on('afterComment', async function (files) {
 
     for (let file of files) {
-    
+
       if (!isJs(file.path)) continue
 
       // ^\s* 是为了云掉 //import 这种 ,还是加 m 因为加 了 ^所以需要加 m不然只匹配第一行
