@@ -6,6 +6,7 @@ export default async function () {
   const { config, ssr, fs } = this
   const that=this
   return async function (files) {
+  
     if (!config.renderEnabled) {
       return
     }
@@ -55,16 +56,17 @@ export default async function () {
     for (let file of files) {
 
       if (isServerFile(file)) {
-
+    
         //必须得有 /m 因为这样才能每行都匹配，否则只匹配最开始的一行      
         file.content = file.content.replace(/^\s*import\s+["'](\S+)\s*=>\s*(\S+)["'];?/m, (match, from, to) => {
 
           from = join(file.key, '../', from)
 
           //htmlkey 寻找 render js，用于pre-ssr
-          ssr.set(from, join(config.render.dist, file.key))
-          //web路径 ，寻找 render js 用于ssr
-          ssr.set(to, join(config.render.publishPath || config.render.dist, file.key))
+          ssr.set(from, join(config.dist, config.render.dist, file.key))
+
+          //web路径 ，寻找 render js 用于ssr  render.dist是一个目录名。
+          ssr.set(to, `./${config.render.dist}/${file.key}`)
           return ''
         })
       }
@@ -75,7 +77,7 @@ export default async function () {
 
     let list = files.map(file => {
 
-      return fs.writeFile(join(config.render.dist, file.key), file.content)
+      return fs.writeFile(join(config.dist, config.render.dist, file.key), file.content)
     })
     await Promise.all(list)
   }
