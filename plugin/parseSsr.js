@@ -1,20 +1,22 @@
 
 import { join } from 'path'
-import { getSsrFile, getRelatePath, isServerFile,isBrowserFile } from '../lib/ssr.js'
+import { getSsrFile, getRelatePath, isBrowserFile, isServerFile } from '../lib/ssr.js'
 export default async function () {
 
   const { config, ssr, fs } = this
-  const that=this
+  const that = this
   return async function (files) {
-  
-    if (!config.renderEnabled) {
-      return
-    }
-    let fileList = getSsrFile(files)
-    await relate(fileList)
 
-    let saveFiles = await dealImport(fileList, config.src)
-    await save(saveFiles)
+    if (config.renderEnabled) {
+
+      let fileList = getSsrFile(files)
+      await relate(fileList)
+
+      let saveFiles = await dealImport(fileList, config.src)
+      await save(saveFiles)
+    }
+    //删除服务端专用文件
+    this.files = files.filter(file => !isServerFile(file))
   }
 
   //处理普通import
@@ -37,11 +39,11 @@ export default async function () {
           }
 
           return match.replace(/['"](.+?)['"]/, (match, path) => {
-       
+
             let result = that.dealSuffix(path)
-            result = getRelatePath(file.key,result)
+            result = getRelatePath(file.key, result)
             result = `"${result}"`
-           
+
             return result
           })
         })
@@ -49,17 +51,17 @@ export default async function () {
     })
 
   }
- 
+
   //html文件 和render js的关系
   async function relate(files) {
 
     for (let file of files) {
 
       if (isServerFile(file)) {
-    
+
         //必须得有 /m 因为这样才能每行都匹配，否则只匹配最开始的一行      
         file.content = file.content.replace(/^\s*import\s+["'](\S+)\s*=>\s*(\S+)["'];?/m, (match, from, to) => {
-
+         
           from = join(file.key, '../', from)
 
           //htmlkey 寻找 render js，用于pre-ssr
@@ -69,8 +71,10 @@ export default async function () {
           ssr.set(to, `./${config.render.dist}/${file.key}`)
           return ''
         })
+
       }
     }
+
   }
 
   async function save(files) {
