@@ -39,7 +39,7 @@ if (options.folder) {
   specialConfig.folder = options.folder
 }
 if (options.render) {
-  specialConfig.renderEnabled = true
+  specialConfig.render = { enable: true }
 }
 
 async function init() {
