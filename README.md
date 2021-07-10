@@ -104,24 +104,10 @@ import  Swiper from  'swiper'
 import 'swiper/swiper-bundle.css'
 ```
 ## 前端使用node模块
-前面介绍了引用 node模块的语法，使用之前，需要先安装。
-
 工具会尝试查找浏览器可以使用的文件，如果找不到，需要手动加配置。
-比如对于 swiper 如果找不到，在base.js中加如下配置
-```js
-  alias:{
-    'node/swiper':{
-      dep:[],
-      path:'swiper-bundle.min.js',
-      export:'Swiper'
-    }
-  }
-```
-如果这个模块有依赖，在dep里填写 key 即可
-export 是模块导出的全局变量。
 
-对于常用的node模块 工具一般是可以自动处理的。
-> 注意，只有前端用到的模块写到 package.json的 dependencies ，其它的都写到 devDependencies。工具会读取 dependencies中的模块进行处理。
+详情请参见 [配置详解](doc/config.md)
+
 ## 开发插件
 不用害怕，因为工具本身的设计非常简单,开发插件也非常简单
 完成核心功能的插件是系统插件，系统插件是内置的。

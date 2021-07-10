@@ -1,4 +1,5 @@
 # 配置文件
+
 配置文件放在根目录下的 .hotpack文件夹里。有三个文件。
 1. base.js 公共配置
 2. dev.js 开发配置
@@ -27,36 +28,74 @@ export default {
     {
       name: 'babel',
       use: babel
-      
-    },
-    'node',
-    {
-      name: 'hot',
-      use: hot
-    },
-    {
-      name: 'docker',
-      use: docker
-    },
-    {
-      name: 'eslint',
-      use: eslint,
-      opt: {
-        errorBreak: false,
-      },
-    },
-    {
-      name: 'postcss',
-      use: postcss,
-      isH5: (key) => {
-          return /^h5/.test(key)
-      }
-    },
-    {
-      name: 'vue3',
-      use: vue3,
     }
   ]
 };
 
+```
+## plugin 配置
+插件是一个array,但执行顺序与书写顺序无关，因为用户插件都是通过监听系统插件的事件来实现功能的。
+每一个插件都用一个对象表示，包含四个选项，用两个示例说明一下
+
+`name`,`use`是必填的，`test`, `opt`选填
+
+```js
+import babel from './plugin/babel.js'
+{
+  name:'babel' //插件的名称，展示用，必填,
+  use:babel  //是一个函数，这个函数符合插件的要求,
+  test:/\.js$/  //过滤条件，可以是一个正则
+  opt:{}, //传给插件的数据
+},
+{
+  name:'node',
+  use:'node', //node是系统内置的用户插件，所以直接写 'node'
+  test:(key)=>key.endWidth('.js) //过滤条件，可以是一个函数
+  opt:{} //传给插件的数据
+}
+```
+
+## node 插件参数
+node 插件是系统内置的。可以直接用。
+
+对于发布 umd 格式 Js 的模块 node插件 都能处理好
+对于 不是 umd 格式的需要手动配置一下。
+比如 xss 模块
+```js
+{
+  name:'node',
+  use:'node',
+  opt:{
+    alias:{
+      xss:{
+        path:'dist/xss.min.js', //工具看到 .min.js 会认为这是 一个不需要转码和压缩可以直接用的文件。
+        export:'filterXSS'  // 全局空间的名字。这个名字是工具导出模块用的。代码中引用模块可以用 import xss from 'xss'
+      }
+    }
+  } 
+}
+```
+有的模块是有css文件的，比如 swiper.js
+
+```js
+import 'swiper/swiper-bundle.css'
+import Swiper from 'swiper'
+```
+每次引用 `swiper` 都要引一个样式，还是挺麻烦的，可以写在配置里，这样只引用 `js` 即可
+
+```js
+{
+  name:'node',
+  use:'node',
+  opt:{
+    alias:{
+      swiper:{
+        css:'swiper/swiper-bundle.css'
+      }
+    }
+  } 
+}
+```
+```js
+import Swiper from 'swiper'
 ```
