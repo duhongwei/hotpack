@@ -1,5 +1,5 @@
 
-import { join } from 'path'
+import { join, resolve } from 'path'
 import { getSsrFile, getRelatePath, isBrowserFile, isServerFile } from '../lib/ssr.js'
 
 export default async function () {
@@ -15,6 +15,20 @@ export default async function () {
     //删除服务端专用文件
     this.files = files.filter(file => !isServerFile(file))
 
+    let renderInfo = this.config.render
+
+    if (renderInfo.enable && renderInfo.src) {
+      let p = resolve(renderInfo.src, 'package.json')
+   
+      let packageInfo = await this.fs.readJson(p)
+      Object.assign(packageInfo.dependencies,this.ssr.get('dep'))
+      await this.fs.writeFile(p, packageInfo)
+      //copy 整个src到dist
+      await this.fs.copy(renderInfo.src, this.config.dist).catch(e => {
+        console.trace(e)
+        process.exit(1)
+      })
+    } 
   }
 
   //处理普通import

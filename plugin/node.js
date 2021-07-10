@@ -17,7 +17,7 @@ export default async function ({ debug }) {
 
       if (!isJs(file.path)) continue
 
-      // ^\s* 是为了云掉 //import 这种 ,还是加 m 因为加 了 ^所以需要加 m不然只匹配第一行
+      // ^\s* 是为了去掉 //import 这种 ,还是加 m 因为加 了 ^所以需要加 m不然只匹配第一行
       await this.util.replace(file.content, /^\s*import\s+['"]([\w@].+?\.css)['"]/mg, async (match, key) => {
 
         let from = join(nodeRoot, key)
@@ -37,7 +37,6 @@ export default async function ({ debug }) {
         })
         return match
       })
-
     }
   })
   //声明 amd,这样才能直接用 umd，因为hotload.js模块管理并不完全符合adm标准，所以默认 define.amd=undefined

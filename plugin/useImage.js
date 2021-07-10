@@ -9,12 +9,11 @@
  * 2 :src="a+'xx.jpg"  在vue 模板中这样写，会被匹配到，但无法替换。会报找不到key的错误
  * 3 字符串中的图片可能也会被匹配到，但其实不应该被匹配
  */
-import { isMedia } from '../lib/util.js'
 
 export default async function ({ debug }) {
   const that = this
 
-  this.on('afterUploadMedia', function (files) {
+  return async function (files) {
     for (let file of files) {
 
       //对于压缩过的文件 ，正则可能失败，所以忽略压缩的文件，而且一般来说，压缩过的都是不需要再处理的
@@ -72,7 +71,7 @@ export default async function ({ debug }) {
         return `src=(${url})`
       })
     }
-  })
+  }
   //去掉后面的 ？#,对于唯一标识(md5)的资源来说，这些没有意义，还影响判断
   function normalize(path) {
     return path.split(/[?#]/)[0]
@@ -97,15 +96,15 @@ export default async function ({ debug }) {
       return false
     }
     //不是白名单中的资源，不处理，这样会误杀，但会保证可用性和安全性
-    if (!isMedia(path)) {
+    if (!that.util.isMedia(path)) {
       return false
     }
     return true
   }
   function replace(path, file) {
- 
+
     let key = that.getKeyFromWebPath({ webPath: path, fileKey: file.key })
-    
+
     if (!that.version.has(key)) {
       throw new Error(`key ${key} not in version, path is  ${path},key is ${file.key}`)
     }
