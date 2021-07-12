@@ -12,7 +12,25 @@ export default async function ({ debug, opt }) {
   const { util: { md5, isJs, isMedia, joinKey }, version } = this
   const that = this
   opt.alias = opt.alias || {}
+  this.on('afterParse', async function (files) {
+    for (let key in opt.alias) {
+      let item = opt.alias[key]
+      //如果有，只有一个css
+      if (item.css) {
+        let jsKey = `node/${key}.js`
 
+        for (let file of files) {
+
+          if (file.importInfo.some(item => item.key == jsKey)) {
+            file.importInfo.push({
+              key: `node/${key}/${item.css}`,
+              token: []
+            })
+          }
+        }
+      }
+    }
+  });
   //import node 模块的 css
   this.on('afterComment', async function (files) {
 
@@ -22,8 +40,10 @@ export default async function ({ debug, opt }) {
 
       //如果有，只有一个css
       if (item.css) {
+
         let p = join(nodeRoot, key, item.css)
         let c = await this.fs.readFile(p)
+
         if (!c) {
           throw new Error(`文件${p}不存在!`)
         }
@@ -43,7 +63,7 @@ export default async function ({ debug, opt }) {
       await this.util.replace(file.content, /^\s*import\s+['"]([\w@].+?\.css)['"]/mg, async (match, path) => {
         let key = `node/${path}`
         let from = join(nodeRoot, path)
-        //同样的node css可能 被 多次引用 ，引用一次即可
+        //同样的node css可能 被多次引用 ，引用一次即可
         if (this.files.some(item => item.key == key)) {
           debug('skip', key)
           return ''
@@ -81,12 +101,14 @@ export default async function ({ debug, opt }) {
       debug(`load ${name}`)
 
       let key = getKey(name)
-      if (this.version.has(key)) {
+      //等老的页面都 ok后，把 this.version.get(key).path 这个判断去掉。因为以后 有key的 node 模块 一定会有path
+      if (this.version.has(key) && this.version.get(key).path) {
         await loadItem(name, this.version.get(key).path)
       }
       else {
         let pList = await findUmdFile(name)
         let isHit = false
+
         for (let p of pList) {
           isHit = await loadItem(name, p)
           if (isHit) {
@@ -164,14 +186,14 @@ export default async function ({ debug, opt }) {
    * 样式中 import这种先不管了。样式中引用样式先不管
    */
   async function loadRelate(fileKey, pathList) {
-  
+
     for (let webPath of pathList) {
-      let from = join(nodeRoot, fileKey.replace('node/',''), '..', webPath)
+      let from = join(nodeRoot, fileKey.replace('node/', ''), '..', webPath)
 
       const content = await that.fs.readFile(from)
-     
+
       let key = joinKey({ fileKey, webPath })
-  
+
       that.addFile({
         key,
         content
@@ -179,7 +201,7 @@ export default async function ({ debug, opt }) {
     }
   }
   async function findUmdFile(name) {
-   
+
     const key = getKey(name)
     let p = join(nodeRoot, name, 'package.json')
 
@@ -193,7 +215,7 @@ export default async function ({ debug, opt }) {
     if (typeof filePath == 'string') {
       return [filePath]
     }
-    if (typeof filePath == 'object') {
+    if (typeof filePath == 'object' && filePath.path) {
       return [filePath.path]
     }
     let packageInfo = await that.fs.readJson(p)
@@ -217,7 +239,7 @@ export default async function ({ debug, opt }) {
       if (!stat.isDirectory()) {
         continue
       }
-      let filesDist = fs.readdirSync(join(nodeRoot, name, p)).filter(item => /^\w.*?\.js/.test(item)).sort(item => {
+      let filesDist = fs.readdirSync(join(nodeRoot, name, p)).filter(item => /^\w.*?\.js$/.test(item)).sort(item => {
         if (item.endsWith('min.js')) return -1
         else return 1
       }).map(item => join(p, item))
@@ -227,10 +249,11 @@ export default async function ({ debug, opt }) {
   }
   async function loadItem(name, path) {
     const key = getKey(name)
+
     let p = join(nodeRoot, name, path)
 
     let content = await that.fs.readFile(p)
-    console.log(opt.alias)
+
     if (opt.alias && opt.alias[name] && opt.alias[name]['export']) {
       let exportKey = opt.alias[name]['export']
       content = `${content}

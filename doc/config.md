@@ -90,7 +90,7 @@ import Swiper from 'swiper'
   opt:{
     alias:{
       swiper:{
-        css:'swiper/swiper-bundle.css'
+        css:'swiper-bundle.css'
       }
     }
   } 
