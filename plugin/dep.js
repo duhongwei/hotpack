@@ -11,7 +11,11 @@ export default async function ({ debug }) {
     if (!version.has(item)) {
       logger.error(`no ${item}，或许应该检查配置中的 group 项`, true)
     }
-    return version.get(item).url
+    const url = version.get(item).url
+    if (!url) {
+      throw new Error(`${item} has no url`)
+    }
+    return url
   }
   function dealDep({ cssList, jsList }) {
 

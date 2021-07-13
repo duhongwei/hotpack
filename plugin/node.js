@@ -94,7 +94,7 @@ export default async function ({ debug, opt }) {
     }
   })
 
-  this.on('afterAmd', async function () {
+  this.on('afterKey', async function () {
     const p = await that.fs.readJson(resolve('package.json'))
     let names = Object.keys(p.dependencies)
     for (let name of names) {
@@ -102,6 +102,7 @@ export default async function ({ debug, opt }) {
 
       let key = getKey(name)
       //等老的页面都 ok后，把 this.version.get(key).path 这个判断去掉。因为以后 有key的 node 模块 一定会有path
+  
       if (this.version.has(key) && this.version.get(key).path) {
         await loadItem(name, this.version.get(key).path)
       }
@@ -284,12 +285,18 @@ export default async function ({ debug, opt }) {
       content = content.replace(/sourceMappingURL=/, '')
       content = content + '\n'
     }
+ 
     that.addFile({
+      meta: {
+        transform:false
+      },
       key,
       content
     })
-    const hash = md5(content)
-    version.set({ key, hash, path })
+    //不要加 hash否则 slim时候发现 内容没变，hash相同，直接去掉了。就不会生成 url
+    //const hash = md5(content)
+    
+    version.set({ key, path })
     return true
   }
 

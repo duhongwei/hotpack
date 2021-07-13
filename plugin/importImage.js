@@ -5,9 +5,11 @@ export default async function ({ debug }) {
     for (let file of files) {
       if (!isJs(file.key)) continue
       file.content = file.content.replace(/\bimport\s+([\w-_]+)\s+from\s+['"](.+)['"]/g, (match, variable, path) => {
+
         if (!isMedia(path)) return match
 
         let key = this.getKeyFromWebPath({ webPath: path, fileKey: file.key })
+      
         let url = null
         if (this.isDev()) {
           url = `/${key}`
