@@ -71,6 +71,7 @@ export default async function ({ debug }) {
         return `src=(${url})`
       })
     }
+    await this.fs.writeFile(this.config.versionPath, this.version.get())
   }
   //去掉后面的 ？#,对于唯一标识(md5)的资源来说，这些没有意义，还影响判断
   function normalize(path) {
