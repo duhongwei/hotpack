@@ -41,7 +41,7 @@ npm install -D hotpack
 
 dev.js,pro.js会覆盖 base.js的相同配置
 
-配置参数详解请查看 [配置详情][doc/config.md]
+配置参数详解请查看 [配置详情](doc/config.md)
 
 ## shell 命令
 ```bash

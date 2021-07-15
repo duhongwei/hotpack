@@ -5,7 +5,8 @@
 2. dev.js 开发配置
 3. pro.js 发布配置
 
-dev.js,pro.js会覆盖 base.js的相同配置
+dev.js,pro.js会覆盖 base.js的相同配置，覆盖是深度覆盖，合并详情请参见 [deepmerge](https://github.com/TehShrike/deepmerge)
+
 ## 所有配置
 ```js
 export default {
@@ -14,16 +15,16 @@ export default {
     enable: false //启用或不启用,默认为false
     dist:'_render_' //发布服务端文件的路径，默认为 _render_
  },
+ //测试服务器设置
+ server:{
+   page:{
+     //页面找不到时显示页面路径
+     404:'/404.html' 
+     //single路径的特点一般是 /about 没有后缀名，这种路径如果找不到 /about/index.html页面，跳 single，否则跳 404
+     single:'/index.html'
+   }
+ }
   dist: './dev', //发布目录，开发环境和发布环境是分开的，开发环境一般叫 dev ,发布环境一般叫 dist
-  proxy: {
-    //host: 'http://wcc.anquanke.com',
-    //host: 'http://m.aqk.qihoo.net',
-    host: 'http://www.anquanke.com',
-    match: /\/webapi\//,
-    map: function (path) {
-      return path.replace('/webapi', '');
-    },
-  },
   plugin: [
     {
       name: 'babel',
@@ -81,7 +82,7 @@ node 插件是系统内置的。可以直接用。
 import 'swiper/swiper-bundle.css'
 import Swiper from 'swiper'
 ```
-每次引用 `swiper` 都要引一个样式，还是挺麻烦的，可以写在配置里，这样只引用 `js` 即可
+每次引用 `swiper` 都要引一个样式，还是挺麻烦的，可以写在配置里
 
 ```js
 {
@@ -96,6 +97,8 @@ import Swiper from 'swiper'
   } 
 }
 ```
+
+这样只引用 `js` 即可，工具会根据配置自动引用样式
 ```js
 import Swiper from 'swiper'
 ```

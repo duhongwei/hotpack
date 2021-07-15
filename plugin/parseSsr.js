@@ -11,56 +11,67 @@ export default async function () {
     let fileList = getSsrFile(files)
     await relate(fileList)
     let saveFiles = await dealImport(fileList, config.src)
+    //把服务端需要的文件写入磁盘
     await save(saveFiles)
     //删除服务端专用文件
     this.files = files.filter(file => !isServerFile(file))
 
     let renderInfo = this.config.render
-
     if (renderInfo.enable && renderInfo.src) {
-      let p = resolve(renderInfo.src, 'package.json')
-   
-      let packageInfo = await this.fs.readJson(p)
-      Object.assign(packageInfo.dependencies,this.ssr.get('dep'))
-      await this.fs.writeFile(p, packageInfo)
       //copy 整个src到dist
       await this.fs.copy(renderInfo.src, this.config.dist).catch(e => {
         console.trace(e)
         process.exit(1)
       })
-    } 
+    }
   }
 
   //处理普通import
   async function dealImport(files) {
     return files.map(file => {
+      //静态 import
+      let content = file.content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/smg, (match, key) => {
+        //删除css引用 
+        if (key.endsWith('.css')) {
+          return ''
+        }
+        //node，正好直接用,@是具有全名空间的模块
+        if (/^[\w@]/.test(key)) {
+          return match
+        }
+        //删除浏览器专用
+        if (isBrowserFile(file)) {
+          return ''
+        }
+
+        return match.replace(/['"](.+?)['"]/, (match, path) => {
+          let result = ''
+
+          result = that.dealSuffix(file.key, path)
+
+          result = getRelatePath(file.key, result)
+          result = `"${result}"`
+
+          return result
+        })
+
+      })
+      //动态 import ,import('xxx)
+      content = content.replace(/\bimport\((.+?)\)/g, (match, path) => {
+        path = path.trim().replace(/['"]/g, '')
+        if (path.endsWith('css')) {
+          throw new Error('css can not resolve css  at server side')
+        }
+        if (isBrowserFile(file)) {
+          throw new Error('css can not resolve browser file at server side')
+        }
+        path = that.dealSuffix(file.key, path)
+        path = getRelatePath(file.key, path)
+        return `import("${path}")`
+      })
       return {
         key: file.key,
-        content: file.content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/smg, (match, key) => {
-          //删除css引用 
-          if (key.endsWith('.css')) {
-            return ''
-          }
-          //node，正好直接用,@是具有全名空间的模块
-          if (/^[\w@]/.test(key)) {
-            return match
-          }
-          //删除浏览器专用
-          if (isBrowserFile(file)) {
-            return ''
-          }
-
-          return match.replace(/['"](.+?)['"]/, (match, path) => {
-            let result = ''
-
-            result = that.dealSuffix(file.key, path)
-
-            result = getRelatePath(file.key, result)
-            result = `"${result}"`
-
-            return result
-          })
-        })
+        content
       }
     })
 
