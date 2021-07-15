@@ -85,7 +85,7 @@ export default async function ({ debug, opt }) {
       })
     }
   })
-  //声明 amd,这样才能直接用 umd，因为hotload.js模块管理并不完全符合adm标准，所以默认 define.amd=undefined
+  //声明 amd,这样才能直接用 umd，因为hotload.js模块管理并不完全符合 amd 标准，所以默认 define.amd=undefined
   this.on('afterKey', function (files) {
     for (let file of files) {
       if (/\/hotload\.js$/.test(file.key)) {
@@ -101,8 +101,8 @@ export default async function ({ debug, opt }) {
       debug(`load ${name}`)
 
       let key = getKey(name)
+
       //等老的页面都 ok后，把 this.version.get(key).path 这个判断去掉。因为以后 有key的 node 模块 一定会有path
-  
       if (this.version.has(key) && this.version.get(key).path) {
         await loadItem(name, this.version.get(key).path)
       }
