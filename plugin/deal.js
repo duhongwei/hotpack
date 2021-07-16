@@ -2,7 +2,8 @@ export default async function ({ debug }) {
   const { util: { isHtml } } = this
   return async function (files) {
     for (let file of files) {
-      
+      if (file.meta.parsed) continue
+
       this.version.clearDynamicDep(file.key)
 
       for (let { key } of file.dynamicImportInfo) {

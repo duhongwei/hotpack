@@ -4,7 +4,7 @@ export default async function ({ debug }) {
   const { config: { runtimeKey } } = this
   return async function (files) {
     for (let file of files) {
-
+      if (file.meta.parsed) continue
       //min的文件可能也手动添加了export
       //if (/\.min\.js$/.test(file.key)) continue
       debug(`parse ${file.key}`)

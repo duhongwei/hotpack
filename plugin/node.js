@@ -6,10 +6,10 @@
  * 没有统一的规范，查找的方法就是靠试，找现成的，所以可能找不到。出于效率的考虑，并没有调用其它工具来生成js，这时需要手动配置一下路径
  */
 import fs from 'fs'
-import { resolve, join, dirname } from 'path'
+import { resolve, join } from 'path'
 const nodeRoot = join(process.cwd(), 'node_modules')
 export default async function ({ debug, opt }) {
-  const { util: { md5, isJs, isMedia, joinKey }, version } = this
+  const { util: { isJs, isMedia, joinKey }, version } = this
   const that = this
   opt.alias = opt.alias || {}
   this.on('afterParse', async function (files) {
@@ -203,7 +203,6 @@ export default async function ({ debug, opt }) {
   }
   async function findUmdFile(name) {
 
-    const key = getKey(name)
     let p = join(nodeRoot, name, 'package.json')
 
     if (!that.fs.existsSync(p)) {
@@ -285,17 +284,15 @@ export default async function ({ debug, opt }) {
       content = content.replace(/sourceMappingURL=/, '')
       content = content + '\n'
     }
- 
+
     that.addFile({
-      meta: {
-        transform:false
-      },
+      meta: { transformed: true, parsed: true },
       key,
       content
     })
     //不要加 hash否则 slim时候发现 内容没变，hash相同，直接去掉了。就不会生成 url
     //const hash = md5(content)
-    
+
     version.set({ key, path })
     return true
   }

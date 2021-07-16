@@ -1,5 +1,5 @@
 
-import { join, resolve } from 'path'
+import { join } from 'path'
 import { getSsrFile, getRelatePath, isBrowserFile, isServerFile } from '../lib/ssr.js'
 
 export default async function () {
@@ -57,7 +57,7 @@ export default async function () {
 
       })
       //动态 import ,import('xxx)
-      content = content.replace(/\bimport\((.+?)\)/g, (match, path) => {
+      content = content.replace(/=\s*import\((.+?)\)/g, (match, path) => {
         path = path.trim().replace(/['"]/g, '')
         if (path.endsWith('css')) {
           throw new Error('css can not resolve css  at server side')

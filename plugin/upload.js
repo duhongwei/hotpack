@@ -28,7 +28,7 @@ export default async function ({ debug }) {
             if (key.endsWith('.min.js')) {
               needCompress = false
             }
-            if (meta && meta.isMin) {
+            if (meta && meta.minified) {
               needCompress = false
             }
             promiseList.push(
