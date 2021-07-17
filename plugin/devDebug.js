@@ -7,6 +7,7 @@ export default async function ({ debug }) {
     debug('on event afterPath')
     let path = join(this.root, 'browser/debug.js')
     this.addFile({
+      meta: { transformed: true },
       path,
       key: runtimeKey.debug
     })

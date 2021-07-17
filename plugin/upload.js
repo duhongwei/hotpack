@@ -44,10 +44,12 @@ export default async function ({ debug }) {
         }
       }
       else {
+    
         version.set({
           key,
           url: `/${key}`
         })
+     
         debug(`\t ${key} => /${key}`)
       }
     }

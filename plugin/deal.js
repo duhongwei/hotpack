@@ -25,9 +25,16 @@ export default async function ({ debug }) {
 
           if (key.includes('=>')) {
             let [from, to] = key.split(/\s*=>\s*/)
+            debug(`transform ${from}=>${to}`)
             key = from
-            debug(`transform ${key}=>${to}`)
-            this.version.set({ key, dep: file.key })
+            //get js entry from html later,if js is empty, ignore it
+            if (file.content.trim()) {
+              this.version.set({ key, dep: file.key })
+            }
+            else {
+              this.version.set({ key, dep: [] })
+            }
+            //html template built web page,one tempalte could built multi pages
             this.version.addMap({ key, from, to })
           }
           else {
@@ -40,6 +47,11 @@ export default async function ({ debug }) {
         }
       }
       file.importInfo = file.importInfo.filter(info => !info.del)
+
+      if (file.content.trim() == '') {
+        file.del = true
+      }
     }
+    this.del()
   }
 }

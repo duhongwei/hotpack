@@ -31,19 +31,8 @@ export default async function ({ debug }) {
       file.importInfo = info.importInfo || []
       file.exportInfo = info.exportInfo || []
       file.dynamicImportInfo = info.dynamicImportInfo || []
-      if (info) {
-        if (info.code) {
-          file.content = info.code
-        }
-        else {
-          //没有内容的文件删除
-          file.del = true
-        }
-      }
-      else {
-        debug(`no info. key is : ${file.key}`)
-      }
+
+      file.content = info.code
     }
-    this.del()
   }
 }

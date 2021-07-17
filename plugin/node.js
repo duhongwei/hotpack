@@ -8,19 +8,22 @@
 import fs from 'fs'
 import { resolve, join } from 'path'
 const nodeRoot = join(process.cwd(), 'node_modules')
+
 export default async function ({ debug, opt }) {
   const { util: { isJs, isMedia, joinKey }, version } = this
   const that = this
   opt.alias = opt.alias || {}
+
+
   this.on('afterParse', async function (files) {
     for (let key in opt.alias) {
       let item = opt.alias[key]
-      //如果有，只有一个css
+      //if has ,only has one css file
       if (item.css) {
         let jsKey = `node/${key}.js`
 
         for (let file of files) {
-
+      
           if (file.importInfo.some(item => item.key == jsKey)) {
             file.importInfo.push({
               key: `node/${key}/${item.css}`,
@@ -119,6 +122,7 @@ export default async function ({ debug, opt }) {
         if (!isHit) {
           that.config.logger.log(`
           ${name} node 模块 的 文件格式不能自动处理
+          如果 ${name} 不在浏览器中运行，请把它移动到  package.json 的 devDependencies
           需要手动添加配置，帮助文档  https://github.com/duhongwei/hotpack/blob/master/doc/config.md
           `)
           process.exit(1)
@@ -256,9 +260,7 @@ export default async function ({ debug, opt }) {
 
     if (opt.alias && opt.alias[name] && opt.alias[name]['export']) {
       let exportKey = opt.alias[name]['export']
-      content = `${content}
-      export ${exportKey};
-      `
+      content = `define("${key}",[],function(){var define=null,require=null;${content};return ${exportKey};})`
     }
     else {
       let hited = false
@@ -292,7 +294,6 @@ export default async function ({ debug, opt }) {
     })
     //不要加 hash否则 slim时候发现 内容没变，hash相同，直接去掉了。就不会生成 url
     //const hash = md5(content)
-
     version.set({ key, path })
     return true
   }

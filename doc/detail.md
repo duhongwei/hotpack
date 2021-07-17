@@ -32,6 +32,7 @@ this.on('afterPath',()=>{
     key:'other/happy.js'
   })
 })
+```
 3. comment
 删除 css,html中的注释
 完成后派发 `afterComment` 事件
@@ -124,3 +125,27 @@ import loading from './image/loading.png'
 监听 afterUpload 模板内容替换
 4. env
 监听 afterSlim 事件，对node环境 变量 process.env.NODE_ENV，process.env.DATA_ENV 进行替换
+
+
+## 自定义上传
+
+默认是把文件直接copy到本地的缓存目录中，如果要上传cdn或copy到别处，需要自己写一个类。对于这个类必须要实现两个方法
+```js
+ async upload(content, file);
+```
+上传文件。content是要上传的内容，file是文件的名字，是用来获取后缀名的，好做相应的处理
+
+```js
+getUrl(hashList, extname);
+```
+通过hash值来获取 web路径，extname是文件后缀名。
+
+写好类后，加到 发布的配置文件 pro.js 中
+
+```js
+import cdn from 'xxx.js'
+
+export default{
+  cdn
+}
+```

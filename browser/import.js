@@ -26,10 +26,13 @@ define('runtime/import.js', function (system) {
         //得加key，不然会取默认的lastScriptPath,会把readyMod给冲掉
         require('import.r1', [key], function (mod) {
           clearTimeout(t)
-          resolve(mod.default)
+          if (mod.default) {
+            resolve(mod.default)
+          }
+          else {
+            resolve(mod)
+          }
         });
-      }).catch(function (e) {
-        throw e
       })
     })
   }

@@ -57,7 +57,7 @@ export default async function () {
 
       })
       //动态 import ,import('xxx)
-      content = content.replace(/=\s*import\((.+?)\)/g, (match, path) => {
+      content = content.replace(/(?<![.\w])import\((.+?)\)/g, (match, path) => {
         path = path.trim().replace(/['"]/g, '')
         if (path.endsWith('css')) {
           throw new Error('css can not resolve css  at server side')
@@ -65,8 +65,14 @@ export default async function () {
         if (isBrowserFile(file)) {
           throw new Error('css can not resolve browser file at server side')
         }
-        path = that.dealSuffix(file.key, path)
-        path = getRelatePath(file.key, path)
+        //if node module
+        if (/^[\w@]/.test(path)) {
+          path = `node/${path}`
+        }
+        else {
+          path = that.dealSuffix(file.key, path)
+          path = getRelatePath(file.key, path)
+        }
         return `import("${path}")`
       })
       return {

@@ -9,13 +9,15 @@ export default async function ({ debug }) {
     debug('on event afterPath')
     let path = join(this.root, 'browser/hotload.js')
     this.addFile({
+      meta: { transformed: true },
       path,
-      key:runtimeKey.core
+      key: runtimeKey.core
     })
     path = join(this.root, 'browser/import.js')
     this.addFile({
+      meta: { parsed: true, transformed: true },
       path,
-      key:runtimeKey.import
+      key: runtimeKey.import
     })
   })
 
@@ -29,7 +31,7 @@ export default async function ({ debug }) {
         debug(`add ${runtimeKey.import}`)
         file.dep.jsList[0].unshift(runtimeKey.import)
       }
-      
+
       if (file.dep.jsList[0].length > 0) {
         debug(`add ${runtimeKey.core}`)
         file.dep.jsList[0].unshift(runtimeKey.core)

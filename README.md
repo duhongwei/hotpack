@@ -1,36 +1,28 @@
 # hotpack
-`hotpack` 是一个 `web` 打包器，最大的优点就是快速。如果不是首次运行，都在 “毫秒“ 级别。
+`hotpack` 是一个 `web` 打包器，最大的优点就是文件级缓存，非常快速。如果不是首次运行，无论多大的项目，都在 “毫秒“ 级别。
 ## Feature
-
-1. `hotpack` 是一个复杂度为 O(1) 的构建系统
+1. 每个构建的文件都会单独缓存，可随时重用。
 2. 支持单页，多页，服务端渲染（同构）
 3. 开发环境不破坏目录结构
 
-### `hotpack` 是一个复杂度为 O(1) 的构建系统
-每个构建的文件都会单独缓存，可随时重用。如果你从不更改某个文件，那就永远用不着重新构建它了。项目规模不会影响构建时间
-
-### 不破坏目录结构
-开发环境中，你开发的时候文件结构是什么样子的，在浏览器中的文件结构就是什么样子的，这样会让你非常方便的对代码或文件进行查找。
-
-## 快速体验
-最快的办法是直接clone 模板项目，这样不需要任何配置，可以直接开始。目前仅有一个模板可选，就是通用 `vue3` 模板
-```bash
-git clone https://github.com/duhongwei/hotpack-tpl-vue3.git  my-mpp
-cd my-app
-npm install 
-npm start 
-```
-运行成功会看到输出 `hotpack.info server run at 3000`
-打开浏览器 输入风址 `http://localhost:3000`
-
-也可以从头开始创建项目
 ## 安装
+如果只有一两个项目，建议全局安装
 ```bash
 npm install -g hotpack
 ```
-也可以单独安装在项目里面
+如果项目很多，建议单独安装在项目里
 ```bash
 npm install -D hotpack
+```
+## 执行
+所有命令都需要在项目的根目录才能运行
+```bash
+#进入项目根目录
+cd myApp
+#启动开发环境
+hotpack
+#或者启动发布
+hotpack pro
 ```
 ### 配置文件
 配置文件放在根目录下的 .hotpack文件夹里。有三个文件。
@@ -41,19 +33,7 @@ npm install -D hotpack
 
 dev.js,pro.js会覆盖 base.js的相同配置
 
-配置参数详解请查看 [配置详情](doc/config.md)
-
-## shell 命令
-```bash
-#进入项目根目录
-cd myApp
-#启动开发环境
-hotpack
-#或者启动发布
-hotpack pro
-#启用热更新 3001是为热更新指定的端口号 w 是 watch 的意思
-hotpack  -w 3001
-```
+[配置详情](doc/config.md)
 
 ## 引用资源
 `hotpack` 项目要求用 ES6 module 语法编写。
@@ -90,9 +70,9 @@ import time from './time'
 ```
 对于没写后缀的情况，首先会补全 ./time.js 如果文件不存在，补全 ./time/index.js
 
-两个含义
+两个作用
 - 用`/index.html`做模板，生成 site/index.html
-- ./index.html 依赖 index.js
+- 通过 ./index.html 找到 index.js 入口
 
 7. 引入node模块
 直接写模块名即可
@@ -104,22 +84,29 @@ import  Swiper from  'swiper'
 import 'swiper/swiper-bundle.css'
 ```
 ## 前端使用node模块
-工具会尝试查找浏览器可以使用的文件，如果找不到，需要手动加配置。
+
+根目录 packae.json dependences 中的 node模块会被 node plugin 处理。如果只是服务端用的模块请放在 devDependences 中
+
+`node plugin` 会尝试查找浏览器可以使用的文件，如果找不到，需要手动加配置。
 
 详情请参见 [配置详解](doc/config.md)
 
-## 开发插件
-不用害怕，因为工具本身的设计非常简单,开发插件也非常简单
-完成核心功能的插件是系统插件，系统插件是内置的。
+## 用户插件
 
-1 系统插件是顺序执行的,从源文件  src 开始 到 dist 结束，每个系统插件执行完会发一个事件出来。
-src => 插件1 =>  插件2 =>  插件3 => dist
+大部分功能都是以插件的形式来完成的。
+如果你需要的功能没有现成的插件，可以自己开发一个。
 
-2 用户插件，用监听事件的方式编写的插件，监听事件的好处是不用操心执行顺序的问题。
+详情请看 [插件](doc/plugin.md)
 
-详情请看 [插件开发](doc/plugin.md)
+[更多详情](doc/detail.md)
 
-## 开发
-如果你觉得用着不爽，想修改，可以多了解一下。
-
-[更多](doc/detail.md)
+## 快速体验
+最快的办法是直接clone 模板项目，这样不需要任何配置，可以直接开始。目前仅有一个模板可选，就是通用 `vue3` 模板
+```bash
+git clone https://github.com/duhongwei/hotpack-tpl-vue3.git  my-mpp
+cd my-app
+npm install 
+npm start 
+```
+运行成功会看到输出 `hotpack.info server run at 3000`
+打开浏览器 输入风址 `http://localhost:3000`

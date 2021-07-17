@@ -56,8 +56,10 @@ import babel from './plugin/babel.js'
 }
 ```
 
-## node 插件参数
+## node 插件
 node 插件是系统内置的。可以直接用。
+根目录 packae.json dependences 中的 node模块会被 node plugin 处理。所以如果只是服务端服的模块请放在 devDependences 中
+`node plugin` 会尝试查找浏览器可以使用的文件，如果找不到，需要手动加配置。
 
 对于发布 umd 格式 Js 的模块 node插件 都能处理好
 对于 不是 umd 格式的需要手动配置一下。
@@ -68,9 +70,10 @@ node 插件是系统内置的。可以直接用。
   use:'node',
   opt:{
     alias:{
+      //示例：没有 umd 文件，手动指定浏览器可用的文件，并把全局变量导出
       xss:{
         path:'dist/xss.min.js', //工具看到 .min.js 会认为这是 一个不需要转码和压缩可以直接用的文件。
-        export:'filterXSS'  // 全局空间的名字。这个名字是工具导出模块用的。代码中引用模块可以用 import xss from 'xss'
+        export:'filterXSS' 
       }
     }
   } 
@@ -102,3 +105,4 @@ import Swiper from 'swiper'
 ```js
 import Swiper from 'swiper'
 ```
+

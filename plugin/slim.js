@@ -8,7 +8,6 @@ export default async function ({ debug }) {
       }
       let hash = md5(file.content)
       if (version.diff(file.key, hash)) {
-
         version.set({ key: file.key, hash })
       }
       else {
