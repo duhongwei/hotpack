@@ -15,7 +15,7 @@ export default async function ({ debug }) {
     })
     path = join(this.root, 'browser/import.js')
     this.addFile({
-      meta: { parsed: true, transformed: true },
+      meta: { parsed: true },
       path,
       key: runtimeKey.import
     })
