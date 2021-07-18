@@ -6,7 +6,7 @@
  * 没有统一的规范，查找的方法就是靠试，找现成的，所以可能找不到。出于效率的考虑，并没有调用其它工具来生成js，这时需要手动配置一下路径
  */
 import fs from 'fs'
-import { resolve, join } from 'path'
+import path, { resolve, join } from 'path'
 const nodeRoot = join(process.cwd(), 'node_modules')
 
 export default async function ({ debug, opt }) {
@@ -23,7 +23,7 @@ export default async function ({ debug, opt }) {
         let jsKey = `node/${key}.js`
 
         for (let file of files) {
-      
+
           if (file.importInfo.some(item => item.key == jsKey)) {
             file.importInfo.push({
               key: `node/${key}/${item.css}`,
@@ -51,7 +51,8 @@ export default async function ({ debug, opt }) {
           throw new Error(`文件${p}不存在!`)
         }
         let relatePath = getCssRelate(c)
-        await loadRelate(key, relatePath);
+
+        await loadRelate(relatePath, `${key}/${item.css}`);
         this.addFile({
           key: `node/${key}/${item.css}`,
           content: c
@@ -78,7 +79,7 @@ export default async function ({ debug, opt }) {
         }
         let relatePath = getCssRelate(c)
 
-        await loadRelate(key, relatePath);
+        await loadRelate(relatePath, path);
 
         this.addFile({
           key,
@@ -185,22 +186,20 @@ export default async function ({ debug, opt }) {
     return path.split(/[?#]/)[0]
   }
   /**
-   * 把样式文件中引用的字体，图片 copy过来，
-   * key是css 写的那个  import 'swiper/swiper-bundle.css'
-   * warning:
-   * 样式中 import这种先不管了。样式中引用样式先不管
+   * copy image and font from node_modules
+   * 
+   * pathList is assets list ,relative to path
+   * path is css file path relative to node_moduels
+   * 
    */
-  async function loadRelate(fileKey, pathList) {
-
+  async function loadRelate(pathList, path) {
+    
     for (let webPath of pathList) {
-      let from = join(nodeRoot, fileKey.replace('node/', ''), '..', webPath)
-
+      const key = joinKey({ fileKey: path, webPath })
+      let from = join(nodeRoot, key)
       const content = await that.fs.readFile(from)
-
-      let key = joinKey({ fileKey, webPath })
-
       that.addFile({
-        key,
+        key:`node/${key}`,
         content
       })
     }
@@ -260,24 +259,40 @@ export default async function ({ debug, opt }) {
 
     if (opt.alias && opt.alias[name] && opt.alias[name]['export']) {
       let exportKey = opt.alias[name]['export']
+
       content = `define("${key}",[],function(){var define=null,require=null;${content};return ${exportKey};})`
     }
     else {
       let hited = false
+      //define.amd?define("ELEMENT",["vue"],t)
       content = content.replace(/define.amd(.{1,3})define\(([^)]+)\)/, (match, part1, part2) => {
         hited = true
         let info = part2.split(',')
-
-        //拿到 factory，在最后一个参数
-        let factory = info.reverse()[0]
-        let deps = []
-        if (opt.alias[key] && opt.alias[key].deps) {
-          let d = opt.alias[key].deps
-          d = d.map(item => `"node/${item}.js"`).join(',')
-          deps = `[${d}],`
+        let deps = [], factory = null
+        //key,dep,factory
+        if (info.length === 3) {
+          deps = JSON.parse(info[1])
+          factory = info[2]
         }
+
+        else if (info.length === 2) {
+          factory = info[1]
+          if (info[0].startsWith(`[`)) {
+            deps = JSON.parse(info[0])
+          }
+        }
+        else {
+          factory = info[0]
+        }
+
+        if (opt.alias[key] && opt.alias[key].deps) {
+          deps = opt.alias[key].deps
+        }
+        deps = deps.map(item => `"node/${item}.js"`).join(',')
+        deps = `[${deps}]`
+
         //约定 node模块都用node/开头
-        return `define.amd${part1}define("${key}",${deps}${factory})`
+        return `define.amd${part1}define("${key}",${deps},${factory})`
       })
       if (!hited) {
         return false
