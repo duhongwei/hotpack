@@ -136,9 +136,8 @@ export default async function ({ debug, opt }) {
     return `node/${name}.js`
   }
 
-  //判断是否是一个需要替换的资源
   function shouldReplace(path) {
-    //如果已经是网络地址了，不处理
+    //ignore netwok adress
     if (/^http|^\/\//.test(path)) {
       return false
     }
@@ -160,14 +159,10 @@ export default async function ({ debug, opt }) {
     }
     return true
   }
-  /**
-    * 处理所有不带引号的 url(xxx) 
-    * 1. 背景图片
-    * 2. 字体
-   */
+  
+  // get pictures and fonts required from content
   function getCssRelate(content) {
     const pathList = []
-    //用replace只因为之前写过，直接拿过来
     content.replace(/url\(([^)]+)\)/g, (match, path) => {
       path = path.replace(/['"]/g, '')
       path = path.trim()
@@ -181,7 +176,7 @@ export default async function ({ debug, opt }) {
     return pathList
   }
 
-  //去掉后面的 ？#,对于唯一标识(md5)的资源来说，这些没有意义，还影响判断
+  //hotpack use md5 to seperate file version. so ?# is no need
   function normalize(path) {
     return path.split(/[?#]/)[0]
   }
@@ -193,13 +188,13 @@ export default async function ({ debug, opt }) {
    * 
    */
   async function loadRelate(pathList, path) {
-    
+
     for (let webPath of pathList) {
       const key = joinKey({ fileKey: path, webPath })
       let from = join(nodeRoot, key)
       const content = await that.fs.readFile(from)
       that.addFile({
-        key:`node/${key}`,
+        key: `node/${key}`,
         content
       })
     }
@@ -236,7 +231,7 @@ export default async function ({ debug, opt }) {
       else return 1
     })
 
-    //只执行一级探测，因为目标文件只能在根目录或一个文件夹中
+    //only search one  depth
     for (let p of plist) {
       let stat = fs.statSync(join(nodeRoot, name, p))
       if (!stat.isDirectory()) {
@@ -269,20 +264,32 @@ export default async function ({ debug, opt }) {
         hited = true
         let info = part2.split(',')
         let deps = [], factory = null
-        //key,dep,factory
-        if (info.length === 3) {
-          deps = JSON.parse(info[1])
-          factory = info[2]
-        }
+        try {
+          //key,dep,factory
+          if (info.length === 3) {
+            deps = JSON.parse(info[1])
+            if (!Array.isArray(deps)) {
+              throw new Error('invalid deps')
+            }
+            factory = info[2]
+          }
 
-        else if (info.length === 2) {
-          factory = info[1]
-          if (info[0].startsWith(`[`)) {
-            deps = JSON.parse(info[0])
+          else if (info.length === 2) {
+            factory = info[1]
+            if (info[0].startsWith(`[`)) {
+              deps = JSON.parse(info[0])
+              if (!Array.isArray(deps)) {
+                throw new Error('invalid deps')
+              }
+            }
+          }
+          else {
+            factory = info[0]
           }
         }
-        else {
-          factory = info[0]
+        catch (e) {
+          console.log(e.message)
+          return false
         }
 
         if (opt.alias[key] && opt.alias[key].deps) {
