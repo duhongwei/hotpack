@@ -8,7 +8,8 @@ export default async function ({ debug }) {
     for (let groupItem of that.config.group) {
       for (let item of groupItem) {
         if (set.has(item)) {
-          //必须copy再push，不然就全成一个了
+      
+          //copy is required!
           result.push(Array.prototype.slice.call(groupItem))
           break
         }

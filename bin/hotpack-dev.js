@@ -11,9 +11,9 @@ const __filename = fileURLToPath(import.meta.url);
 let info = fs.readFileSync(join(__filename, '../../', 'package.json'), 'utf-8')
 info=JSON.parse(info)
 
-//开发环境
+//node enviroment.  development or production
 process.env.NODE_ENV = 'development'
-//数据接口，开发的时候默认使用开发接口，开发的时候也可以使用测试接口 test 可选值有 development,test,production
+//data enviroment.  development,test or production
 process.env.DATA_ENV = 'development'
 program
   .usage('[options]')

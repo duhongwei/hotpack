@@ -1,3 +1,4 @@
+//AMD,Not fully compliant
 /* eslint-disable */
 'use strict';
 var waitingMod = [];
@@ -14,7 +15,7 @@ var logger = (function () {
     log: log
   };
 })();
-//var onload = onreload = function () { }
+
 var event = {
   on: function (type, fun) {
     this._event = this._event || {};
@@ -63,7 +64,7 @@ var run = (function () {
     }
     if (thisOwner) {
       thisOwner.isHot = true
-      //只要有一个hander返回 false，就会返回false,否则返回 true
+      //whenever there is a hander returnfalse，return false. otherwise return true
       return lego.emit('reload', mod)
     }
     else {
@@ -342,6 +343,5 @@ function defineLegoMod() {
 }
 defineLegoMod();
 window.define = define;
-//hotload.js并不是完全遵守amd
 //window.define.amd = {};
 window.require = require;

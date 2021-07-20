@@ -83,6 +83,7 @@ import  Swiper from  'swiper'
 ```js
 import 'swiper/swiper-bundle.css'
 ```
+css中的图片，字体会被自动处理。
 ## 前端使用node模块
 
 根目录 packae.json dependences 中的 node模块会被 node plugin 处理。如果只是服务端用的模块请放在 devDependences 中

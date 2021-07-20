@@ -1,7 +1,6 @@
-/**
- * 暂时未启用这个插件
- */
 import { join, sep } from 'path'
+
+//this plugin Not enabled. filter file by mtime
 export default async function () {
   function isHidden(file) {
     return file.split(sep).reverse()[0].startsWith('.')
@@ -21,18 +20,18 @@ export default async function () {
           return true
         }
 
-        //html是入口，如果把html忽略了，那么html相关的js，css相关的变化都被忽略了
+
         if (this.util.isHtml(file)) {
           return false
         }
 
         if (isHidden(file)) return true
-        //如果当前是清除，则不再进行文件修改对比，这块需要优化一下，有点乱
 
         if (this.config.clean) {
           return false
         }
-        //文件夹里的文件 发生改变，文件夹的mtime不变
+
+        //file of directory changed ,mtime of directory not change
         if (stats.isDirectory()) {
           return false
         }
@@ -47,7 +46,7 @@ export default async function () {
         return false
       }
       this.config.ignoreFunc = newfun
-      //保存到实例上
+
       this.filterConfig = config
 
       function isSame(path, mtime) {
@@ -55,7 +54,6 @@ export default async function () {
       }
     })
     this.on('afterFile', async () => {
-      //物理保存
       this.fs.writeFile(p, this.filterConfig)
     })
   }

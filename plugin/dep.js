@@ -3,7 +3,6 @@ export default async function ({ debug }) {
   const that = this
   function getHash(key) {
 
-    //debug(`get hash of ${key} from ${JSON.stringify(version.get(key))}`)
     let url = version.get(key).url
     return url.match(/\/([^/]+)\.(js|css)$/)[1]
   }
@@ -35,7 +34,7 @@ export default async function ({ debug }) {
       cur.push(cdn.getUrl(hashList, '.css'))
       return cur
     }, [])
-    //只有hotload一个js,忽略
+    //only hotload.js, ignore
     if (jsList[0].length == 1 && jsList[[0][0] === that.config.runtimeKey.core]) {
       jsList = []
     }

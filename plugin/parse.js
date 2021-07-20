@@ -5,8 +5,7 @@ export default async function ({ debug }) {
   return async function (files) {
     for (let file of files) {
       if (file.meta.parsed) continue
-      //min的文件可能也手动添加了export
-      //if (/\.min\.js$/.test(file.key)) continue
+
       debug(`parse ${file.key}`)
 
       this.version.clearDep(file.key)
@@ -25,7 +24,7 @@ export default async function ({ debug }) {
         this.config.logger.error(`parse ${file.key} error\n ${e.message}`)
 
       }
-      //返回值应该统一，有的时候返回 数组，有的时候是对象，是不对的。
+
       let info = es6Parser.parse()
 
       file.importInfo = info.importInfo || []

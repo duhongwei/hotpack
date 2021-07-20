@@ -1,13 +1,14 @@
-/**
- * 并没有用解析语法，只是简单的用正则。这种并不严谨，可能会出错，但目前来看够用了。
- * 在开发的时候，可能会有一点限制，毕竟正则有不方便处理的地方。
+/** 
  * 
- * 总体来说就两类，一类是带引号的 "xxx.jpg"，和可以 不带引号的，src=xxx url(xxx)
+ * use simple regular expression to match image and font. This is not rigorous and may make mistakes, but it is enough for now.
+ * During development, there may be a little restriction, after all, with regular, there are some inconveniences to deal with.
+ * 
+ * Generally speaking, there are two types，one type has quotes  "xxx.jpg"， the other has not quotes src=xxx url(xxx)
  * 
  * warning
- * 1 因为是简正则，所以被注释掉的代码也会被匹配
- * 2 :src="a+'xx.jpg"  在vue 模板中这样写，会被匹配到，但无法替换。会报找不到key的错误
- * 3 字符串中的图片可能也会被匹配到，但其实不应该被匹配
+ * 1 The commented out code will also be matched
+ * 2 :src="a+'xx.jpg"  If written like this in the vue template, it will be matched but cannot be replaced. Will report an error that the key cannot be found
+ * 3 The image in the template string may also be matched, but it should not be matched
  */
 
 export default async function ({ debug }) {
@@ -16,18 +17,25 @@ export default async function ({ debug }) {
   return async function (files) {
     for (let file of files) {
 
-      //对于压缩过的文件 ，正则可能失败，所以忽略压缩的文件，而且一般来说，压缩过的都是不需要再处理的
+      /**
+       * For compressed files, the regularization may fail, so the compressed files are ignored, 
+       * generally speaking, the compressed files do not need to be processed anymore 
+       * */ 
       if (file.key.endsWith('.min.js') || file.key.endsWith('.min.css')) continue
 
-      //只处理css,html,js这三类文件，不全面，但也够用了，后面需要再加。可以不加到这里，可以 用另外插件的形式，监听 afterUploadMedia 事件即可，
-      if (!/\.(css|html|js)$/.test(file.key)) continue
-
       /**
-       * 处理带引号的 形如 ‘xx.jpg' ，如果两边单引号不一样也行
-       * 路径必须以http,或 . 或 / 开头
+       *It only handles three types of files, css, html, and js, which is not comprehensive, 
+       *but it is enough.if you want handle other type, 
+       * You don’t need to add it here, you can use another plug-in to monitor the afterUploadMedia event. 
+       */
+      if (!/\.(css|html|js)$/.test(file.key)) continue
+      
+      /**
+       * ‘xx.jpg' or "xx.jpg"
+       * The path must start with a http, or. or /
        * 
        * warning
-       * :src="a+'xx.jpg"  在vue 模板中这样写，会被匹配到，但无法替换。
+       * :src="a+'xx.jpg"  If written like this in the vue template, it will be matched but cannot be replaced.
        * 
        */
       file.content = file.content.replace(/['"](http|\.|\/)[^'"]+\.(jpg|jpeg|png|gif|webp|svg|eot|ttf|woff|woff2|etf|mp3|mp4|mpeg)([?#].+)?['"]/g, (match) => {
@@ -43,9 +51,9 @@ export default async function ({ debug }) {
         return `${quote}${url}${quote}`
       })
       /**
-       * 处理所有不带引号的 url(xxx) 
-       * 1. 背景图片
-       * 2. 字体
+       * url(xxx) 
+       * 1. background image
+       * 2. fonts
       */
       file.content = file.content.replace(/url\(([^)]+)\)/g, (match, path) => {
         path = path.replace(/['"]/g, '')
@@ -56,11 +64,13 @@ export default async function ({ debug }) {
           return match
         }
         let url = replace(path, file)
+        
         return `url(${url})`
       })
 
       /**
-       * 处理所有不带引号的 src=xxx,因为 js,vue 中的src 必须带引号，所以这里的特指 html 中的src
+       * src=xxx
+       * Because the src in js and vue must be quoted, so here refers specifically to the src in html
       */
       file.content = file.content.replace(/\bsrc\s*=\s*([\w0-9.?#]+)/g, (match, path) => {
         path = normalize(path)
@@ -68,35 +78,41 @@ export default async function ({ debug }) {
           return match
         }
         let url = replace(path, file)
+
         return `src=(${url})`
       })
     }
-    await this.fs.writeFile(this.config.versionPath, this.version.get())
+    //don't save version,because files are in memory. if error occured,version.json and files on dist can not match!
+    //await this.fs.writeFile(this.config.versionPath, this.version.get())
   }
-  //去掉后面的 ？#,对于唯一标识(md5)的资源来说，这些没有意义，还影响判断
+  //Remove the back? #, for the resource with the unique identifier (md5),  no use and affect the judgment
   function normalize(path) {
     return path.split(/[?#]/)[0]
   }
-  //--------------
-  //判断是否是一个需要替换的资源
+  
   function shouldReplace(path) {
-    //如果已经是网络地址了，不处理
+
     if (/^http|^\/\//.test(path)) {
       return false
     }
-    //已经被hotpack处理过了，不处理
+
     if (/^\/__cdn__\//.test(path)) {
       return false
     }
-    //data url schema 不处理
+
     if (/^data:/.test(path)) {
       return false
     }
-    //如果path里有变量，不处理
+    
+    //If there are variables in path, do not process
     if (/\$\{[^}]+\}/.test(path)) {
       return false
     }
-    //不是白名单中的资源，不处理，这样会误杀，但会保证可用性和安全性
+
+    /**
+     * The resources are not in the whitelist, do not process
+     * this will kill by mistake, but it will ensure availability and security
+     */
     if (!that.util.isMedia(path)) {
       return false
     }
@@ -109,8 +125,10 @@ export default async function ({ debug }) {
     if (!that.version.has(key)) {
       throw new Error(`key ${key} not in version, path is  ${path},key is ${file.key}`)
     }
+
     let url = that.version.get(key).url
     debug(`${key} => ${url}`)
+
     return url
   }
 

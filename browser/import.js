@@ -23,7 +23,7 @@ define('runtime/import.js', function (system) {
         let t = setTimeout(() => {
           reject()
         }, 200)
-        //得加key，不然会取默认的lastScriptPath,会把readyMod给冲掉
+        //key is required.  default key is last scropt path ,which would be overrided
         require('import.r1', [key], function (mod) {
           clearTimeout(t)
           if (mod.default) {

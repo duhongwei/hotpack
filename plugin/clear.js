@@ -1,6 +1,5 @@
-/**
- * js css,media 都会上传cdn，就没用了，删除
- */
+
+ //js css,media be cached or upload to cdn,no use any more，delete
 export default async function ({ debug }) {
   const { util: { isInclude,isMedia } } = this
   return async function (files) {

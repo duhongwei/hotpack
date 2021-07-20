@@ -23,7 +23,6 @@ function run() {
     window.console && window.console.log('%c' + message, 'color:' + color);
   }
 }
-//自动执行
 run()
 export default run
 

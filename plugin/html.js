@@ -1,6 +1,4 @@
-/**
- * 内部调用，排序放在所有插件之后，外部不以调用。
- */
+
 export default async function ({ debug }) {
 
   let { util: { format } } = this
@@ -17,8 +15,7 @@ export default async function ({ debug }) {
     }
     scripts = scripts.join('\n')
     styles = styles.join('\n')
-    //window._dynamic_deps_先硬编码吧。
-    //页面中格式 window._dynamic_deps_={"views/login/index.vue.js":["https://s0.ssl.qhres.com/static/4e0a5cdac90a9847.css","https://s1.ssl.qhres.com/static/21d0467b73e3af4b.js"]}
+    //in html, window._dynamic_deps_={"views/login/index.vue.js":["https://s0.ssl.qhres.com/static/4e0a5cdac90a9847.css","https://s1.ssl.qhres.com/static/21d0467b73e3af4b.js"]}
     for (let key in dynamicDep) {
       let item = dynamicDep[key]
       dynamicDep[key] = [...item.jsList, ...item.cssList]

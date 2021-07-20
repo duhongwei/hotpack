@@ -1,6 +1,3 @@
-/** 
- * include的文件的后缀名很重要，如果是html，会把内容包装一下。
- */
 export default async function ({ debug }) {
   let { version, util: { isText, isMedia, isHtml, isJs, isCss }, config: { logger } } = this
   const that = this
@@ -30,7 +27,6 @@ export default async function ({ debug }) {
 
         if (map.has(key)) {
           let item = map.get(key)
-          //直接解决， 不用再写到dist了。
           item.del = true
           content = getContent(item)
         }
@@ -58,7 +54,7 @@ export default async function ({ debug }) {
       })
     }
     let hasInclude = false
-    //先处理include里的include
+    //include's include
     let includeFiles = files.filter(item => /(^|\/)include\//.test(item.key))
     do {
       hasInclude = false

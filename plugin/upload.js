@@ -14,7 +14,6 @@ export default async function ({ debug }) {
           logger.log(`\t ${key} => base64`)
         }
         else {
-          //临时这样写一下，else 里面的后面会删除。
           if (cdn.isLocal) {
             let url = await cdn.upload(content, key)
             version.set({
