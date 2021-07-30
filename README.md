@@ -1,18 +1,21 @@
 # hotpack
 Hotpack is a web packer. The biggest advantage is file-level caching, which is very fast. If it is not the first run, no matter how big the project is, it is at the "millisecond" level.
+
+[中文文档](README_cn.md)
+
 ## Feature
 1. Each built file will be cached separately and can be reused at any time.
 2. Support single page, multi-page, server-side rendering (isomorphic)
 3. The development environment does not destroy the directory structure
 
-## 安装
+## install
 Environmental requirements Node 14 or above
 
 It is recommended to install globally
 ```bash
 npm install -g hotpack
 ```
-## 执行
+## cmd
 All commands need to be in the root directory of the project to run
 ```bash
 #Enter the project root directory
@@ -29,16 +32,16 @@ The configuration files is placed in the .hotpack folder in the root directory. 
 2. dev.js  Development configuration
 3. pro.js  production configuration
 
-dev.js,pro.js会覆盖 base.js的相同配置
+dev.js, pro.js will overwrite the same configuration of base.js
 
-[配置详情](doc/config.md)
+[configuration details](doc/config.md)
 
-## Reference resources
+## import resources
 `hotpack` project requires writing in ES6 module syntax.
 
 In addition to the normal import syntax, hotpack also has some extensions to the import syntax.
 
-1. Refer to the absolute path, the absolute path is the absolute path relative to the src directory
+1. starts with '/' is the absolute path, the absolute path is the absolute path relative to the src directory
 ```js
 import { time } from '/js/util.js'
 ```
@@ -51,13 +54,16 @@ import loading from './image/loading.png'
 import './index.css'
 ```
 4.  Template physical path => web path
-在 index.js中
+index.js  has code like this
 ```js
 import ‘./index.html=>site/index.html’
 ```
+Fortunately ,you can write this in any javascript file
+
 5. Resources at the same level can omit `./`
 ```js
-import ‘index.css’
+// equal to  import ‘./index.css’  
+import ‘index.css’  
 ```
 ```css
 body{background:url(bg.png)}
@@ -84,17 +90,16 @@ import 'swiper/swiper-bundle.css'
 
 [configuration details](doc/config.md)
 
-## 用户插件
+## User plug-in
 
-大部分功能都是以插件的形式来完成的。
-如果你需要的功能没有现成的插件，可以自己开发一个。
+If the function you need does not have a ready-made plug-in, you can develop one yourself.
 
-详情请看 [插件](doc/plugin.md)
+[plugin](doc/plugin.md)
 
-[更多详情](doc/detail.md)
+[more detail](doc/detail.md)
 
-## 快速体验
-最快的办法是直接clone 模板项目，这样不需要任何配置，可以直接开始。目前仅有一个模板可选，就是通用 `vue3` 模板
+## Quick experience
+The fastest way is to clone the template project directly, so that you can start directly without any configuration. Currently there is only one template to choose from, which is the generic `vue3` template
 
 ```bash
 git clone https://github.com/duhongwei/hotpack-tpl-vue3.git  my-mpp
@@ -102,9 +107,6 @@ cd my-app
 npm install 
 npm start 
 ```
-运行成功会看到输出 `hotpack.info server run at 3000`
-打开浏览器 输入风址 `http://localhost:3000`
 
-> hotpack-tpl-vue3.git 还没写完，暂时未开放。完成后无需配置，可以体验，单页多页，同构。
-> 发布的版本是 0.10.0 所以 npm 安装的暂时是 0.10.0，0,11.0 待测试后发布，文档写的是 0.11.0的文档
-
+Run successfully, you will see the output `hotpack.info server run at 3000`
+ Open the browser and enter the URL `http://localhost:3000`

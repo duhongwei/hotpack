@@ -11,8 +11,12 @@ dev.js, pro.js will overwrite the same configuration of base.js, the overwrite i
 export default {
   //server render
   render: {
-    enable: false //the default is false
-    dist:'_render_' //The path to publish the server file, the default is _render_
+    //the default is false
+    enable: false ,
+    //tell hotpack where to read server side files,the default is render
+    src:'render',
+    //The path to publish the server file, the default is _render_
+    dist:'_render_' 
  },
  server:{
    page:{

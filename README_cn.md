@@ -37,7 +37,7 @@ dev.js,pro.js会覆盖 base.js的相同配置
 `hotpack` 项目要求用 ES6 module 语法编写。
 除了 正常的 import 语法， 工具对 import 语法做了一些扩展。
 
-1. 引用绝对路径,绝对路径是相对于 src 目录的绝对路径
+1. 绝对路径用 ’/' 开头,绝对路径是相对于 src 目录的绝对路径
 ```js
 import { time } from '/js/util.js'
 ```
@@ -104,4 +104,4 @@ npm install
 npm start 
 ```
 运行成功会看到输出 `hotpack.info server run at 3000`
-打开浏览器 输入风址 `http://localhost:3000`
+打开浏览器 输入网址 `http://localhost:3000`
