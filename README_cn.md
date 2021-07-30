@@ -31,7 +31,7 @@ hotpack pro
 
 dev.js,pro.js会覆盖 base.js的相同配置
 
-[配置详情](doc/config.md)
+[配置详情](doc_cn/config.md)
 
 ## 引用资源
 `hotpack` 项目要求用 ES6 module 语法编写。
@@ -84,16 +84,15 @@ css中的图片，字体会被自动处理。
 
 `node plugin` 会尝试查找浏览器可以使用的文件，如果找不到，需要手动加配置。
 
-详情请参见 [配置详解](doc_cn/config.md)
+详情请参见 [配置详情](doc_cn/config.md)
 
 ## 用户插件
 
-大部分功能都是以插件的形式来完成的。
 如果你需要的功能没有现成的插件，可以自己开发一个。
 
-详情请看 [插件](doc/plugin.md)
+详情请看 [插件](doc_cn/plugin.md)
 
-[更多详情](doc/detail.md)
+[更多详情](doc_cn/detail.md)
 
 ## 快速体验
 最快的办法是直接clone 模板项目，这样不需要任何配置，可以直接开始。目前仅有一个模板可选，就是通用 `vue3` 模板

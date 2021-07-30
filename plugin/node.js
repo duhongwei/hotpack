@@ -1,6 +1,6 @@
 
 import fs from 'fs'
-import path, { resolve, join } from 'path'
+import { resolve, join } from 'path'
 const nodeRoot = join(process.cwd(), 'node_modules')
 
 //read node module,search files used in browser
@@ -67,7 +67,7 @@ export default async function ({ debug, opt }) {
 
         let c = await this.fs.readFile(from)
         if (!c) {
-          throw new Error(`文件${from}不存在!`)
+          throw new Error(`${from} not exist!`)
         }
         let relatePath = getCssRelate(c)
 
