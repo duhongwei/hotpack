@@ -1,96 +1,88 @@
 # hotpack
-`hotpack` 是一个 `web` 打包器，最大的优点就是文件级缓存，非常快速。如果不是首次运行，无论多大的项目，都在 “毫秒“ 级别。
+Hotpack is a web packer. The biggest advantage is file-level caching, which is very fast. If it is not the first run, no matter how big the project is, it is at the "millisecond" level.
 ## Feature
-1. 每个构建的文件都会单独缓存，可随时重用。
-2. 支持单页，多页，服务端渲染（同构）
-3. 开发环境不破坏目录结构
+1. Each built file will be cached separately and can be reused at any time.
+2. Support single page, multi-page, server-side rendering (isomorphic)
+3. The development environment does not destroy the directory structure
 
 ## 安装
-如果只有一两个项目，建议全局安装
+Environmental requirements Node 14 or above
+
+It is recommended to install globally
 ```bash
 npm install -g hotpack
 ```
-如果项目很多，建议单独安装在项目里
-```bash
-npm install -D hotpack
-```
 ## 执行
-所有命令都需要在项目的根目录才能运行
+All commands need to be in the root directory of the project to run
 ```bash
-#进入项目根目录
+#Enter the project root directory
 cd myApp
-#启动开发环境
+#Start the development environment
 hotpack
-#或者启动发布
+#Or start publishing
 hotpack pro
 ```
-### 配置文件
-配置文件放在根目录下的 .hotpack文件夹里。有三个文件。
+## Configuration file
+The configuration files is placed in the .hotpack folder in the root directory. There are three files.
 
-1. base.js 公共配置
-2. dev.js 开发配置
-3. pro.js 发布配置
+1. base.js Common configuration
+2. dev.js  Development configuration
+3. pro.js  production configuration
 
 dev.js,pro.js会覆盖 base.js的相同配置
 
 [配置详情](doc/config.md)
 
-## 引用资源
-`hotpack` 项目要求用 ES6 module 语法编写。
-除了 正常的 import 语法， 工具对 import 语法做了一些扩展。
+## Reference resources
+`hotpack` project requires writing in ES6 module syntax.
 
-1. 引用绝对路径,绝对路径是相对于 src 目录的绝对路径
+In addition to the normal import syntax, hotpack also has some extensions to the import syntax.
+
+1. Refer to the absolute path, the absolute path is the absolute path relative to the src directory
 ```js
 import { time } from '/js/util.js'
 ```
-2. 引用图片
+2. import picture
 ```js
 import loading from './image/loading.png'
 ```
-3. 引用样式
+3. import css
 ```js
 import './index.css'
 ```
-4. 路径转换,声明 html 依赖
+4.  Template physical path => web path
 在 index.js中
 ```js
 import ‘./index.html=>site/index.html’
 ```
-5. 路径的同级引用
-同级的资源可以省略 `./`
+5. Resources at the same level can omit `./`
 ```js
 import ‘index.css’
 ```
 ```css
 body{background:url(bg.png)}
 ```
-6. 路径补全
+6. Path completion
+in this example, first complete ./time.js If the file does not exist, complete ./time/index.js
 ```js
 import time from './time'
 ```
-对于没写后缀的情况，首先会补全 ./time.js 如果文件不存在，补全 ./time/index.js
-
-两个作用
-- 用`/index.html`做模板，生成 site/index.html
-- 通过 ./index.html 找到 index.js 入口
-
-7. 引入node模块
-直接写模块名即可
+7. import node modules
+Just write the module name directly
 ```js
 import  Swiper from  'swiper'
 ```
-8. 引入node模块中的样式
+8. import css in node modules
 ```js
 import 'swiper/swiper-bundle.css'
 ```
-css中的图片，字体会被自动处理。
-## 前端使用node模块
+## use node modules
 
-根目录 packae.json dependences 中的 node模块会被 node plugin 处理。如果只是服务端用的模块请放在 devDependences 中
+> Note: The node module in the root directory packae.json dependences will be processed by the node plugin. If it is only a server-side module, please put it in devDependences.
 
-`node plugin` 会尝试查找浏览器可以使用的文件，如果找不到，需要手动加配置。
+`node plugin` will try to find the files that the browser can use. If it can't be found, it needs to be configured manually.
 
-详情请参见 [配置详解](doc/config.md)
+[configuration details](doc/config.md)
 
 ## 用户插件
 
@@ -103,6 +95,7 @@ css中的图片，字体会被自动处理。
 
 ## 快速体验
 最快的办法是直接clone 模板项目，这样不需要任何配置，可以直接开始。目前仅有一个模板可选，就是通用 `vue3` 模板
+
 ```bash
 git clone https://github.com/duhongwei/hotpack-tpl-vue3.git  my-mpp
 cd my-app
@@ -111,3 +104,7 @@ npm start
 ```
 运行成功会看到输出 `hotpack.info server run at 3000`
 打开浏览器 输入风址 `http://localhost:3000`
+
+> hotpack-tpl-vue3.git 还没写完，暂时未开放。完成后无需配置，可以体验，单页多页，同构。
+> 发布的版本是 0.10.0 所以 npm 安装的暂时是 0.10.0，0,11.0 待测试后发布，文档写的是 0.11.0的文档
+

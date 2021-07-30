@@ -1,30 +1,37 @@
-# 配置文件
+# Configuration
+The configuration file is placed in the .hotpack folder in the root directory. There are three files.
+1. base.js common configuration
+2. dev.js development configuration
+3. pro.js production configuration
 
-配置文件放在根目录下的 .hotpack文件夹里。有三个文件。
-1. base.js 公共配置
-2. dev.js 开发配置
-3. pro.js 发布配置
+dev.js, pro.js will overwrite the same configuration of base.js, the overwrite is deep overwrite, please refer to the merge details [deepmerge](https://github.com/TehShrike/deepmerge)
 
-dev.js,pro.js会覆盖 base.js的相同配置，覆盖是深度覆盖，合并详情请参见 [deepmerge](https://github.com/TehShrike/deepmerge)
-
-## 所有配置
+## All configurations
 ```js
 export default {
-  //服务端渲染
+  //server render
   render: {
-    enable: false //启用或不启用,默认为false
-    dist:'_render_' //发布服务端文件的路径，默认为 _render_
+    enable: false //the default is false
+    dist:'_render_' //The path to publish the server file, the default is _render_
  },
- //测试服务器设置
  server:{
    page:{
-     //页面找不到时显示页面路径
+     //not found
      404:'/404.html' 
-     //single路径的特点一般是 /about 没有后缀名，这种路径如果找不到 /about/index.html页面，跳 single，否则跳 404
+     /**
+      * 路径找不到的处理流程
+      * 1. First perform path completion, for example, /about will be completed to /about/index.html If index.html does not exist, go to 2
+      * 2. If there is a single configuration, jump to the configuration page, no 404 error is reported
+     */
      single:'/index.html'
    }
  }
-  dist: './dev', //发布目录，开发环境和发布环境是分开的，开发环境一般叫 dev ,发布环境一般叫 dist
+  /**
+  * The release directory, the development environment and the release environment are separated, 
+  * the development environment is generally called dev, 
+  * and the release environment is generally called dist
+  */
+  dist: './dev', 
   plugin: [
     {
       name: 'babel',
@@ -34,58 +41,72 @@ export default {
 };
 
 ```
-## plugin 配置
-插件是一个array,但执行顺序与书写顺序无关，因为用户插件都是通过监听系统插件的事件来实现功能的。
-每一个插件都用一个对象表示，包含四个选项，用两个示例说明一下
+## plugin configuration
 
-`name`,`use`是必填的，`test`, `opt`选填
+The plug configuration is an array, but the execution order has nothing to do with the writing order, because user plug-ins all realize their functions by monitoring the events of the system plug-ins.
+
+Each plug-in is represented by an object and contains four options. Let me illustrate with two examples
+
+`name`,`use` is required，`test`, `opt` is optional
 
 ```js
 import babel from './plugin/babel.js'
 {
-  name:'babel' //插件的名称，展示用，必填,
-  use:babel  //是一个函数，这个函数符合插件的要求,
-  test:/\.js$/  //过滤条件，可以是一个正则
-  opt:{}, //传给插件的数据
+  //The name of the plug-in, used for display, required,
+  name:'babel' 
+  //Is a function, this function meets the requirements of the plug-in,required
+  use:babel ,
+  //Filter condition, can be a regular or a functon,optional
+  test:/\.js$/,
+  //Data passed to the plugin,optional
+  opt:{}, 
 },
 {
   name:'node',
-  use:'node', //node是系统内置的用户插件，所以直接写 'node'
-  test:(key)=>key.endWidth('.js) //过滤条件，可以是一个函数
-  opt:{} //传给插件的数据
+  //node is a built-in user plug-in of the system, so write'node' directly
+  use:'node', 
+  //Filter condition, can be a regular or a functon,optional
+  test:(key)=>key.endWidth('.js),
+  opt:{}
 }
 ```
 
-## node 插件
-node 插件是系统内置的。可以直接用。
-根目录 packae.json dependences 中的 node模块会被 node plugin 处理。所以如果只是服务端服的模块请放在 devDependences 中
-`node plugin` 会尝试查找浏览器可以使用的文件，如果找不到，需要手动加配置。
+## node plugin
+The node plug-in is built-in in the system. Can be used directly.
+> note：The node module in the root directory packae.json dependences will be processed by the node plugin. So if it is only a server-side server module, please put it in devDependences
 
-对于发布 umd 格式 Js 的模块 node插件 都能处理好
-对于 不是 umd 格式的需要手动配置一下。
-比如 xss 模块
+
+`node plugin` will try to find the files that the browser can use. If it can't be found, it needs to be configured manually.
+
+
+It can handle the module node plug-in that publishes umd format Js.
+
+otherwise,you have to configure it manually.
+
+eg: xss module
 ```js
 {
   name:'node',
   use:'node',
   opt:{
     alias:{
-      //示例：没有 umd 文件，手动指定浏览器可用的文件，并把全局变量导出
+      //No umd file, manually specify the file available to the browser, and export the global variables
       xss:{
-        path:'dist/xss.min.js', //工具看到 .min.js 会认为这是 一个不需要转码和压缩可以直接用的文件。
+        //When hotpack sees .min.js, it will think it is a file that can be used directly without transcoding and compression.
+        path:'dist/xss.min.js',
         export:'filterXSS' 
       }
     }
   } 
 }
 ```
-有的模块是有css文件的，比如 swiper.js
+Some modules have css files, such as swiper.js
 
 ```js
 import 'swiper/swiper-bundle.css'
 import Swiper from 'swiper'
 ```
-每次引用 `swiper` 都要引一个样式，还是挺麻烦的，可以写在配置里
+Every time you import `swiper`, you have to import a style, which is still very troublesome, you can write it in the configuration
 
 ```js
 {
@@ -101,7 +122,7 @@ import Swiper from 'swiper'
 }
 ```
 
-这样只引用 `js` 即可，工具会根据配置自动引用样式
+After the configuration is added, only `js` can be referenced, and hotpack will automatically reference the style according to the configuration
 ```js
 import Swiper from 'swiper'
 ```
