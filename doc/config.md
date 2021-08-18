@@ -14,9 +14,7 @@ export default {
     //the default is false
     enable: false ,
     //required tell hotpack where to read server side files,the default is render
-    src:'render',
-    //The path to publish the server file, the default is _render_
-    dist:'_render_' 
+    src:'render'
  },
  server:{
    page:{

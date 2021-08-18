@@ -12,17 +12,43 @@ node >=14
 ```bash
 npm install -g hotpack
 ```
-## 执行
-所有命令都需要在项目的根目录才能运行
+## 常用命令
+
+所有 命令必须在项目根目录，一般是 src 目录所在的目录。
+
 ```bash
-#进入项目根目录
-cd myApp
-#启动开发环境
-hotpack
-#或者启动发布
+#Start the development build,The default command of hotpack is dev, it can also be written as hotpack
+hotpack dev
+
+#use 3001 port
+hotpack dev -p 3001
+
+#no server
+hotpack dev -s
+
+#start publishing build
 hotpack pro
+
+#start server 
+hotpack pro -s
+
+#clear dev cache
+hotpack dev -c
+
+#clear pro cache
+hotpack pro -c
+
 ```
+
+more cmd see help
+
+```bash
+hotpack dev -h
+hotpack  pro -h
+```
+
 ## 配置文件
+
 配置文件放在根目录下的 .hotpack文件夹里。有三个文件。
 
 1. base.js 公共配置
@@ -102,5 +128,9 @@ cd my-app
 npm install 
 npm start 
 ```
-运行成功会看到输出 `hotpack.info server run at 3000`
-打开浏览器 输入网址 `http://localhost:3000`
+[详情](https://github.com/duhongwei/hotpack-tpl-vue3)
+
+## 清除缓存
+
+hotpack 缓存非常强大，但是偶尔可能会带来问题。只要清除缓存，一般就没有问题了。
+

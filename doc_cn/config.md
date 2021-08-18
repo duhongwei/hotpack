@@ -15,9 +15,7 @@ export default {
     //启用或不启用,默认为false,
     enable: false ,
     //必选参数 从哪里读server side 文件
-    src:"render",
-    //发布服务端文件的路径，默认为 _render_
-    dist:'_render_'
+    src:"render"
  },
  //测试服务器设置
  server:{

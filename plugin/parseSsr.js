@@ -9,6 +9,9 @@ export default async function () {
   return async function (files) {
 
     let fileList = getSsrFile(files)
+  
+    //fileList = fileList.filter(file => !that.config.browserFiles.includes(file.key))
+    
     await relate(fileList)
     let saveFiles = await dealImport(fileList, config.src)
 
@@ -29,6 +32,7 @@ export default async function () {
   //static import
   async function dealImport(files) {
     return files.map(file => {
+
       //static import
       let content = file.content.replace(/^\s*import\s+[\s\S]*?['"](.+?)['"];?\s*$/smg, (match, key) => {
         if (key.endsWith('.css')) {
@@ -38,9 +42,14 @@ export default async function () {
         if (/^[\w@]/.test(key)) {
           return match
         }
+
         if (isBrowserFile(file)) {
           return ''
         }
+        /*let webKey = that.getKeyFromWebPath({ fileKey: file.key, webPath: key })
+        if (config.browserFiles.includes(webKey)) {
+          return ''
+        }*/
 
         return match.replace(/['"](.+?)['"]/, (match, path) => {
           let result = ''
@@ -96,6 +105,7 @@ export default async function () {
 
           // ssr info
           ssr.set(to, `./${config.render.dist}/${file.key}`)
+
           return ''
         })
 

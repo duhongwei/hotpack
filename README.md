@@ -1,30 +1,53 @@
-# hotpack
+# Hotpack
 Hotpack is a web packer. The biggest advantage is file-level caching, which is very fast. If it is not the first run, no matter how big the project is, it is at the "millisecond" level.
 
-[中文文档](README_cn.md)
+[中文](README_cn.md)
 
 ## Feature
 1. Each built file will be cached separately and can be reused at any time.
 2. Support single page, multi-page, server-side rendering (isomorphic)
 3. The development environment does not destroy the directory structure
 
-## install
+## Install
 Environmental requirements Node 14 or above
 
 It is recommended to install globally
 ```bash
 npm install -g hotpack
 ```
-## cmd
-All commands need to be in the root directory of the project to run
+## Common commands
+All commands need to be in the root directory of the project to run，usually the directory where the src directory is located
 ```bash
-#Enter the project root directory
-cd myApp
-#Start the development environment
-hotpack
-#Or start publishing
+#Start the development build,The default command of hotpack is dev, it can also be written as hotpack
+hotpack dev
+
+#use 3001 port
+hotpack dev -p 3001
+
+#no server
+hotpack dev -s
+
+#start publishing build
 hotpack pro
+
+#start server 
+hotpack pro -s
+
+#clear dev cache
+hotpack dev -c
+
+#clear pro cache
+hotpack pro -c
+
 ```
+
+more cmd see help
+
+```bash
+hotpack dev -h
+hotpack  pro -h
+```
+
 ## Configuration file
 The configuration files is placed in the .hotpack folder in the root directory. There are three files.
 
@@ -36,7 +59,7 @@ dev.js, pro.js will overwrite the same configuration of base.js
 
 [configuration details](doc/config.md)
 
-## import resources
+## Import resources
 `hotpack` project requires writing in ES6 module syntax.
 
 In addition to the normal import syntax, hotpack also has some extensions to the import syntax.
@@ -82,7 +105,7 @@ import  Swiper from  'swiper'
 ```js
 import 'swiper/swiper-bundle.css'
 ```
-## use node modules
+## Use node modules
 
 > Note: The node module in the root directory packae.json dependences will be processed by the node plugin. If it is only a server-side module, please put it in devDependences.
 
@@ -105,8 +128,13 @@ The fastest way is to clone the template project directly, so that you can start
 git clone https://github.com/duhongwei/hotpack-tpl-vue3.git  my-mpp
 cd my-app
 npm install 
-npm start 
 ```
 
-Run successfully, you will see the output `hotpack.info server run at 3000`
- Open the browser and enter the URL `http://localhost:3000`
+[more detail](https://github.com/duhongwei/hotpack-tpl-vue3)
+
+ ## About cache
+
+The hotpack cache is very powerful, but occasionally it may cause problems. As long as the cache is cleared, there is generally no problem.
+
+
+
