@@ -77,7 +77,6 @@ import loading from './image/loading.png'
 import './index.css'
 ```
 4.  Template physical path => web path
-index.js  has code like this
 ```js
 import ‘./index.html=>site/index.html’
 ```

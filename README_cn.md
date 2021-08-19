@@ -76,7 +76,6 @@ import loading from './image/loading.png'
 import './index.css'
 ```
 4. 模板物理路径 => web path
-在 index.js中
 ```js
 import ‘./index.html=>site/index.html’
 ```
