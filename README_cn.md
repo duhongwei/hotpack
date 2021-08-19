@@ -112,7 +112,16 @@ css中的图片，字体会被自动处理。
 
 详情请参见 [配置详情](doc_cn/config.md)
 
-## 用户插件
+## 插件
+
+编写满足所有需求的插件，可能会非常复杂和庞大。开发需要的功能即可，并放在自己的私有命名空间下面
+
+- [@duhongwei/hotpack-babel](https://github.com/duhongwei/hotpack-babel)
+- [@duhongwei/hotpack-eslint](https://github.com/duhongwei/hotpack-eslint)
+- [@duhongwei/hotpack-compress](https://github.com/duhongwei/hotpack-compress)
+- [@duhongwei/hotpack-postcss](https://github.com/duhongwei/hotpack-postcss)
+- [@duhongwei/hotpack-vue3](https://github.com/duhongwei/hotpack-vue3)
+- [@duhongwei/hotpack-proxy](https://github.com/duhongwei/hotpack-proxy)
 
 如果你需要的功能没有现成的插件，可以自己开发一个。
 

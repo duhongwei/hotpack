@@ -113,7 +113,16 @@ import 'swiper/swiper-bundle.css'
 
 [configuration details](doc/config.md)
 
-## User plug-in
+## Plugins
+
+If you write a plug-in that can meet all needs, the plug-in becomes more and more complex and larger. Therefore, it is recommended to put the plug-in under the personal namespace to realize the functions you need.
+
+- [@duhongwei/hotpack-babel](https://github.com/duhongwei/hotpack-babel)
+- [@duhongwei/hotpack-eslint](https://github.com/duhongwei/hotpack-eslint)
+- [@duhongwei/hotpack-compress](https://github.com/duhongwei/hotpack-compress)
+- [@duhongwei/hotpack-postcss](https://github.com/duhongwei/hotpack-postcss)
+- [@duhongwei/hotpack-vue3](https://github.com/duhongwei/hotpack-vue3)
+- [@duhongwei/hotpack-proxy](https://github.com/duhongwei/hotpack-proxy)
 
 If the function you need does not have a ready-made plug-in, you can develop one yourself.
 
@@ -126,7 +135,7 @@ The fastest way is to clone the template project directly, so that you can start
 
 ```bash
 git clone https://github.com/duhongwei/hotpack-tpl-vue3.git  my-mpp
-cd my-app
+cd my-app/main
 npm install 
 ```
 
@@ -135,6 +144,3 @@ npm install
  ## About cache
 
 The hotpack cache is very powerful, but occasionally it may cause problems. As long as the cache is cleared, there is generally no problem.
-
-
-

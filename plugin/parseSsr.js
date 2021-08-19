@@ -1,5 +1,5 @@
 
-import { join } from 'path'
+import { join, sep } from 'path'
 import { getSsrFile, getRelatePath, isBrowserFile, isServerFile } from '../lib/ssr.js'
 
 export default async function () {
@@ -9,9 +9,9 @@ export default async function () {
   return async function (files) {
 
     let fileList = getSsrFile(files)
-  
+
     //fileList = fileList.filter(file => !that.config.browserFiles.includes(file.key))
-    
+
     await relate(fileList)
     let saveFiles = await dealImport(fileList, config.src)
 
@@ -99,7 +99,7 @@ export default async function () {
         file.content = file.content.replace(/^\s*import\s+["'](\S+)\s*=>\s*(\S+)["'];?/m, (match, from, to) => {
 
           from = join(file.key, '../', from)
-
+          from = from.split(sep).join('/')
           // pre-ssr info
           ssr.set(from, join(config.dist, config.render.dist, file.key))
 
