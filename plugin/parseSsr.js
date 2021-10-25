@@ -101,7 +101,7 @@ export default async function () {
           from = join(file.key, '../', from)
           from = from.split(sep).join('/')
           // pre-ssr info
-          ssr.set(from, join(config.dist, config.render.dist, file.key))
+          ssr.set(from, join(config.rawDist, config.render.dist, file.key))
 
           // ssr info
           ssr.set(to, `./${config.render.dist}/${file.key}`)
