@@ -142,3 +142,58 @@ npm start
 
 hotpack 缓存非常强大，但是偶尔可能会带来问题。只要清除缓存，一般就没有问题了。
 
+## vue单文件 样式防重名
+```
+<template>
+  <div class="_scope">
+     <div class="logo"></div>
+  </div>
+</template>
+
+<script>
+export default {
+ 
+}
+</script>
+
+<style>
+._scope {
+  height: 50px;
+  background: #000;
+}
+
+.logo {
+ width:200px;
+ height:200px;
+}
+
+</style>
+```
+hoptack 编译后 _scope 会变替换成全局唯一的类名,模块内的类名也会被加上 类型限定
+
+```
+<template>
+  <div class="_22">
+     <div class="logo"></div>
+  </div>
+</template>
+
+<script>
+export default {
+ 
+}
+</script>
+
+<style>
+._22 {
+  height: 50px;
+  background: #000;
+}
+
+.22 .logo {
+ width:200px;
+ height:200px;
+}
+
+</style>
+```
