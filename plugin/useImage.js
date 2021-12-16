@@ -20,7 +20,7 @@ export default async function ({ debug }) {
       /**
        * For compressed files, the regularization may fail, so the compressed files are ignored, 
        * generally speaking, the compressed files do not need to be processed anymore 
-       * */ 
+       * */
       if (file.key.endsWith('.min.js') || file.key.endsWith('.min.css')) continue
 
       /**
@@ -29,7 +29,7 @@ export default async function ({ debug }) {
        * You don’t need to add it here, you can use another plug-in to monitor the afterUploadMedia event. 
        */
       if (!/\.(css|html|js)$/.test(file.key)) continue
-      
+
       /**
        * ‘xx.jpg' or "xx.jpg"
        * The path must start with a http, or. or /
@@ -46,9 +46,27 @@ export default async function ({ debug }) {
         if (!shouldReplace(path)) {
           return match
         }
-        let url = replace(path, file)
 
-        return `${quote}${url}${quote}`
+        if (path.includes('...')) {
+          let m = path.match(/(\d+)\.\.\.(\d+)/)
+
+          if (!m) {
+            throw new Error('should like  1...10')
+          }
+          const start = m[1]
+          const end = m[2]
+          const urls = []
+          for (let i = start; i <= end; i++) {
+            let p = path.replace(/\d+\.\.\.\d+/, i)
+            let url = replace(p, file)
+            urls.push(`${quote}${url}${quote}`)
+          }
+          return urls.join(',')
+        }
+        else {
+          let url = replace(path, file)
+          return `${quote}${url}${quote}`
+        }
       })
       /**
        * url(xxx) 
@@ -64,7 +82,7 @@ export default async function ({ debug }) {
           return match
         }
         let url = replace(path, file)
-        
+
         return `url(${url})`
       })
 
@@ -89,7 +107,7 @@ export default async function ({ debug }) {
   function normalize(path) {
     return path.split(/[?#]/)[0]
   }
-  
+
   function shouldReplace(path) {
 
     if (/^http|^\/\//.test(path)) {
@@ -103,7 +121,7 @@ export default async function ({ debug }) {
     if (/^data:/.test(path)) {
       return false
     }
-    
+
     //If there are variables in path, do not process
     if (/\$\{[^}]+\}/.test(path)) {
       return false
@@ -118,6 +136,7 @@ export default async function ({ debug }) {
     }
     return true
   }
+
   function replace(path, file) {
 
     let key = that.getKeyFromWebPath({ webPath: path, fileKey: file.key })
