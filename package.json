@@ -1,6 +1,6 @@
 {
   "name": "hotpack",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "type": "module",
   "description": "",
   "main": "index.js",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "@duhongwei/parser": "^3.0.2",
-    "chalk": "^4.1.2",
+    "chalk": "^5.0.0",
     "clone": "^2.1.2",
     "commander": "^8.3.0",
     "deepmerge": "^4.2.2",
