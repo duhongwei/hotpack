@@ -142,7 +142,14 @@ export default async function ({ debug }) {
     let key = that.getKeyFromWebPath({ webPath: path, fileKey: file.key })
 
     if (!that.version.has(key)) {
-      throw new Error(`key ${key} not in version, path is  ${path},key is ${file.key}`)
+      console.trace()
+      /**
+       * 如何不停止运行的话，会导致文件 没有写入 dev或dist,但内存中的version 已经更新。
+       * 场景：
+       * 在image 里添加新图片，同时在样式中引用不存在图片，导致报错，没有写新图片写入，但version已经更新
+       * 修改错误图片的地址，因为version里有这个图片，不报错，但是访问 不到新图片，新图版还没来的及写入 dev 或 dist目录      
+      */
+      that.config.logger.error(`key ${key} not in version, path is  ${path},key is ${file.key}`,true)
     }
 
     let url = that.version.get(key).url
