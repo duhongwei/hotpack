@@ -299,7 +299,7 @@ export default async function ({ debug, opt }) {
     }
 
     that.addFile({
-      meta: { transformed: true, parsed: true },
+      meta: { transformed: false, parsed: true },
       key,
       content
     })
