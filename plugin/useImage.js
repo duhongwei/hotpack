@@ -38,7 +38,7 @@ export default async function ({ debug }) {
        * :src="a+'xx.jpg"  If written like this in the vue template, it will be matched but cannot be replaced.
        * 
        */
-      file.content = file.content.replace(/['"](http|\.|\/)[^'"]+\.(jpg|jpeg|png|gif|webp|svg|eot|ttf|woff|woff2|etf|mp3|mp4|mpeg)([?#].+)?['"]/g, (match) => {
+      file.content = file.content.replace(/['"](http|\.|\/)[^'"]+\.(jpg|jpeg|png|gif|webp|svg|eot|ttf|woff|woff2|otf|mp3|mp4|mpeg)([?#].+)?['"]/g, (match) => {
 
         let quote = match[0]
         let path = match.replace(/['"]/g, '')
@@ -82,7 +82,7 @@ export default async function ({ debug }) {
           return match
         }
         let url = replace(path, file)
-
+    
         return `url(${url})`
       })
 
