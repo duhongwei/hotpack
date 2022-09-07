@@ -299,7 +299,13 @@ export default async function ({ debug, opt }) {
     }
 
     that.addFile({
-      meta: { transformed: false, parsed: true },
+      /**
+       * 
+       * The js taken from node module has already been transformed. 
+       * If it is transformed twice, an error may be reported, so it is assumed that it has been fully transformed. 
+       * If you still need to transform, please handle it yourself
+       */
+      meta: { transformed: true, parsed: true },
       key,
       content
     })
