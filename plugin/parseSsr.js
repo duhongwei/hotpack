@@ -1,6 +1,6 @@
 
 import { join, sep } from 'path'
-import { getSsrFile, getRelatePath, isBrowserFile, isServerFile } from '../lib/ssr.js'
+import { getSsrFile, getRelatePath, isBrowserFile, isServerFile, isBrowserKey } from '../lib/ssr.js'
 
 export default async function () {
 
@@ -38,13 +38,13 @@ export default async function () {
         if (key.endsWith('.css')) {
           return ''
         }
+        //remove js only used in browser,like query.b.min.js
+        if (isBrowserKey(key)) {
+          return ''
+        }
         //node
         if (/^[\w@]/.test(key)) {
           return match
-        }
-
-        if (isBrowserFile(file)) {
-          return ''
         }
         /*let webKey = that.getKeyFromWebPath({ fileKey: file.key, webPath: key })
         if (config.browserFiles.includes(webKey)) {
