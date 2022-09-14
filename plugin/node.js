@@ -59,7 +59,7 @@ export default async function ({ debug, opt }) {
       await this.util.replace(file.content, /^\s*import\s+['"]([\w@].+?\.css)['"]/mg, async (match, path) => {
         let key = `node/${path}`
         let from = join(nodeRoot, path)
-  
+
         if (this.files.some(item => item.key == key)) {
           debug('skip', key)
           return ''
@@ -81,7 +81,7 @@ export default async function ({ debug, opt }) {
       })
     }
   })
-  
+
   this.on('afterKey', function (files) {
     for (let file of files) {
       if (/\/hotload\.js$/.test(file.key)) {
@@ -149,7 +149,7 @@ export default async function ({ debug, opt }) {
     }
     return true
   }
-  
+
   // get pictures and fonts required from content
   function getCssRelate(content) {
     const pathList = []
@@ -293,9 +293,15 @@ export default async function ({ debug, opt }) {
       if (!hited) {
         return false
       }
-   
+
       content = content.replace(/sourceMappingURL=/, '')
       content = content + '\n'
+    }
+    let item = opt.alias[name]
+    let meta = { transformed: true, parsed: true };
+   
+    if (item && item.meta) {
+      Object.assign(meta, item.meta)
     }
 
     that.addFile({
@@ -305,7 +311,7 @@ export default async function ({ debug, opt }) {
        * If it is transformed twice, an error may be reported, so it is assumed that it has been fully transformed. 
        * If you still need to transform, please handle it yourself
        */
-      meta: { transformed: true, parsed: true },
+      meta,
       key,
       content
     })
