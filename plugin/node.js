@@ -244,8 +244,13 @@ export default async function ({ debug, opt }) {
 
     if (opt.alias && opt.alias[name] && opt.alias[name]['export']) {
       let exportKey = opt.alias[name]['export']
-
-      content = `define("${key}",[],function(){var define=null,require=null;${content};return ${exportKey};})`
+      var deps = [];
+      if (opt.alias[name] && opt.alias[name].deps) {
+        deps = opt.alias[name].deps
+      }
+      deps = deps.map(item => `"node/${item}.js"`).join(',')
+      deps = `[${deps}]`
+      content = `define("${key}",${deps},function(){var define=null,require=null;${content};return ${exportKey};})`
     }
     else {
       let hited = false
@@ -282,8 +287,8 @@ export default async function ({ debug, opt }) {
           return false
         }
 
-        if (opt.alias[key] && opt.alias[key].deps) {
-          deps = opt.alias[key].deps
+        if (opt.alias[name] && opt.alias[name].deps) {
+          deps = opt.alias[name].deps
         }
         deps = deps.map(item => `"node/${item}.js"`).join(',')
         deps = `[${deps}]`
